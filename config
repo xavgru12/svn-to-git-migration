@@ -1,0 +1,17 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[svn-remote "svn"]
+	url = http://ag-reposerver/repo
+	fetch = Curtis_AG/Enterprise/SW/Blockzeit/XGR/ignoreRefsRepo/trunk:refs/remotes/origin/trunk
+	fetch = Curtis_AG/Enterprise/SW/Blockzeit/XGR/ignoreRefsRepo/current:refs/remotes/origin/current
+	branches = Curtis_AG/Enterprise/SW/Blockzeit/XGR/ignoreRefsRepo/*ranches/*/*:refs/remotes/origin/branches/*
+	branches = Curtis_AG/Enterprise/SW/Blockzeit/XGR/ignoreRefsRepo/branches/*:refs/remotes/origin/branches/*
+
+	ignore-refs = refs/remotes/origin/branches/work|refs/remotes/origin/branches/newWork
+
+
