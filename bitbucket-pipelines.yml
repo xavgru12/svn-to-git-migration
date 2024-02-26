@@ -4,13 +4,14 @@ pipelines:
   default:
     - parallel:
       - step:
-          name: Test
+          name: Install packages from requirements.txt
           caches:
             - pip
           script:
             - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - step:
-          name: Lint code
+          name: Lint and format
           script:
             - pip install ruff
-            - ruff --select=ALL .
+            - ruff format --diff  
+            - ruff check . --select N

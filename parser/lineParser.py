@@ -1,5 +1,14 @@
 class LineParser:
-    possible_branch_names = ["/trunk", "/tags", "/distr", "/ProtoGen"]
+    possible_branch_names = [
+        "/trunk",
+        "/tags",
+        "/distr",
+        "/ProtoGen",
+        "/Branches",
+        "/branches",
+        "/Trunk",
+        "/Plugin",
+    ]
 
     def __init__(self, line):
         self.line = line
@@ -26,25 +35,30 @@ class LineParser:
 
     def parse_commit_revision(self):
         modified_line = self.line.split("@")[-1].split(" ")[0]
+        try:
+            modified_line = int(modified_line)
+        except ValueError:
+            modified_line = None
+
         return modified_line
 
     def parse_name(self):
         modified_line = self.line.split(" ")[-1]
         return modified_line
 
-    def parse_base_folder_name(self, remote_url, current_folder=None):
+    def parse_base_folder_name(self, branch_url, current_folder=None):
         if current_folder is None:
             current_folder = ""
         if self.is_line_with_new_base_folder():
-            base_folder = self.line.split()[0]
-            base_folder = base_folder.removeprefix(remote_url + "/trunk")
+            base_folder = self.line.split()[0].replace("%20", " ")
+            base_folder = base_folder.removeprefix(branch_url)
             return base_folder
         else:
             return current_folder
 
     def parse_branch(self):
         line = self.line.split("@")[0]
-        line = line.split("- ^/")[-1]
+        line = line.split("- ^/")[-1].split()[0]
         for branch_name in self.possible_branch_names:
             if branch_name in line:
                 modified_line = branch_name + line.split(branch_name)[1]

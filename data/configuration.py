@@ -1,3 +1,4 @@
-remote_url = r"http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1"
-base_remote_url = r"http://ag-reposerver/repo"
+remote_url = ""
+base_server_url = ""
 local_path = ""
+branch_path = ""
