@@ -1,8 +1,8 @@
 import data.configuration as configuration
 
 
-def create_git_ingnore_file(data_dictionary):
-    with open(f"{configuration.local_path}/.gitignore", "w") as f:
+def create_git_ignore_file(data_dictionary):
+    with open(f"{configuration.get_local_git_path()}/.gitignore", "w") as f:
         f.write(
             "DebugConfig\nDebug\nobj\n*uvguix*\n*uvopt*\n.vs\n*.vcxproj*\n*uvproj\n"
         )

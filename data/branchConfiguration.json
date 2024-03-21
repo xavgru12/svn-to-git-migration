@@ -1,0 +1,60 @@
+{
+    "generic": {
+        "trunk": {
+            "folders": [
+                "trunk",
+                "Trunk",
+                "current",
+                "ProtoGen",
+                "Plugin"
+            ]
+        },
+        "branches": {
+            "folders": [
+                "branches",
+                "Branch",
+                "Branches"
+            ],
+            "subfolders": [
+                "AMU",
+                "AMU1",
+                "FNE",
+                "LBR",
+                "MVE",
+                "feature",
+                "work",
+                "release",
+                "evaluation",
+                "patches"
+            ]
+        },
+        "tags": {
+            "folders": [
+                "tags",
+                "distribution",
+                "distr"
+            ],
+            "subfolders": [
+                "review",
+                "release"
+            ]
+        }
+    },
+    "specific": {
+        "OS": {
+            "branches": [
+                "Projects/enAbleX1/SW/SharedComponents/CMSIS/Device/ST/STM32F7xx/{branches}"
+            ]
+        },
+        "X1FlashCreator": {
+            "tags": [
+                "Projects/enAbleX1/SW/Tools/X1FlashCreator/{distr}"
+            ]
+        },
+        "edes": {
+            "tags": [
+                "Projects/enAbleX1/SW/Tools/Edes/{tags}"
+            ]
+        }
+    }
+}

@@ -27,6 +27,11 @@ def parse():
         "--local-git-path", required=True, help="Specify path to local git repository."
     )
     parser.add_argument(
+        "--migration-output-path",
+        default="C:\\localSharedPool",
+        help="Specify path migration output.",
+    )
+    parser.add_argument(
         "--base-server-url",
         help="Specify path to the server.",
         default="http://ag-reposerver/repo",
@@ -44,9 +49,6 @@ def parse():
     if not os.path.isdir(f"{args.local_git_path}/.git"):
         raise argparse.ArgumentTypeError("path to local git repository is wrong")
 
-    configuration.local_path = args.local_git_path
-    configuration.base_server_url = args.base_server_url
-    configuration.remote_url = args.remote_url
-    configuration.branch_path = args.branch_path
+    configuration.write(args)
 
     return args

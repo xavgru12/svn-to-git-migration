@@ -7,4 +7,3 @@
 	ignorecase = true
 [svn-remote "svn"]
 	url = http://ag-reposerver/repo
-
