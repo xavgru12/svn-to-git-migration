@@ -1,6 +1,7 @@
 import subprocess
 import data.configuration as configuration
 import parser.branchConfigurationParser
+import model.branchModel
 
 
 def add(data_object):
@@ -42,7 +43,11 @@ def add_folders(folders, branch_type, remote_path):
     branch_list = []
 
     for folder in folders:
-        branch = f"{remote_path}/{folder}"
+        if remote_path.endswith(folder):
+            branch = remote_path
+        else:
+            branch = f"{remote_path}/{folder}"
+
         branch_url = f"{configuration.get_base_server_url()}/{branch}"
         if check_for_existence(branch_url) is True:
             remote_part = f"refs/remotes/origin/{folder}"
@@ -75,6 +80,7 @@ def add_subfolders(folders, subfolders, branch_type, remote_path):
 
 
 def check_for_existence(complete_branch):
+    complete_branch = complete_branch.replace(" ", "%20")
     process_string = f"svn info {complete_branch}"
     result = subprocess.run(
         process_string.split(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
@@ -100,3 +106,16 @@ def build_branch_string(branch_type, branch, remote_part):
 def build_ignore_ref_string(ignore_refs, branch_type, remote_part):
     if branch_type != "trunk":
         ignore_refs.append(remote_part)
+
+
+def set_repo_configuration_from(remote_path, branch_dict):
+    if remote_path not in branch_dict:
+        repo_name = parser.branchConfigurationParser.parse_repo_name(
+            remote_path
+        )  # parse repo name is not needed in lineparser, since branch_dict uses remote_path as input
+        print(repo_name)
+        data = model.branchModel.BranchModel(repo_name, remote_path)
+        data.branches = []
+        data.ignore_refs = []
+        add(data)
+        branch_dict[remote_path] = data

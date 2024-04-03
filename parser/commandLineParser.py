@@ -21,10 +21,25 @@ def parse():
         help="Migrate svn externals to git in folder SharedComponentsSources/.",
     )
     parser.add_argument(
+        "--publish",
+        action="store_true",
+        help='Publish and backup from "--migration-output-path" to "--publish-output-path"',
+    )
+    parser.add_argument(
+        "--publish-output-path",
+        default="J:\\XGR\\sharedPool",
+        help="Specify path to publish output",
+    )
+    parser.add_argument(
+        "--migrate-econ-folder",
+        action="store_true",
+        help="Print collected data of externals.",
+    )
+    parser.add_argument(
         "--print", action="store_true", help="Print collected data of externals."
     )
     parser.add_argument(
-        "--local-git-path", required=True, help="Specify path to local git repository."
+        "--local-git-path", help="Specify path to local git repository."
     )
     parser.add_argument(
         "--migration-output-path",
@@ -38,7 +53,6 @@ def parse():
     )
     parser.add_argument(
         "--remote-url",
-        required=True,
         help="Specify path to the specific repository in the server.",
     )
     parser.add_argument(
@@ -46,8 +60,15 @@ def parse():
     )
     args = parser.parse_args()
 
-    if not os.path.isdir(f"{args.local_git_path}/.git"):
-        raise argparse.ArgumentTypeError("path to local git repository is wrong")
+    if not (args.publish or args.migrate_econ_folder):
+        if args.remote_url is None:
+            parser.error("--remote-url missing")
+
+    if args.checkout or args.create_gitignore:
+        if args.local_git_path is None:
+            parser.error("--local-git-path missing")
+        if not os.path.isdir(f"{args.local_git_path}/.git"):
+            raise argparse.ArgumentTypeError("path to local git repository is wrong")
 
     configuration.write(args)
 

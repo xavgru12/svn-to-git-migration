@@ -15,7 +15,7 @@ def parse(remote_url):
 
 
 def get_external_info_from_server(branch_url):
-    first_part_command = f"svn propget svn:externals"
+    first_part_command = "svn propget svn:externals"
     print(f"{first_part_command} {branch_url} -R")
     command_list = []
     command_list.extend(first_part_command.split())
@@ -39,10 +39,8 @@ def parse_external_info(data):
             commit_revision = line_parser.parse_commit_revision()
             name = line_parser.parse_name()
             branch_name = line_parser.parse_branch()
-            repo_name = line_parser.parse_repo_name()
             data_object = SvnRepositoryModel(
                 name,
-                repo_name,
                 base_folder,
                 local_folder_path,
                 remote_path,

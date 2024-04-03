@@ -4,11 +4,16 @@ import os
 
 def write(args):
     configuration = dict()
-    configuration["remote_url"] = args.remote_url
+    args.migrate_econ_folder
+    if args.remote_url:
+        configuration["remote_url"] = args.remote_url
+    if args.local_git_path:
+        configuration["local_git_path"] = args.local_git_path
     configuration["base_server_url"] = args.base_server_url
-    configuration["local_git_path"] = args.local_git_path
     configuration["branch_path"] = args.branch_path
     configuration["migration_output_path"] = args.migration_output_path
+    configuration["publish_output_path"] = args.publish_output_path
+    configuration["migrate_econ_folder"] = args.migrate_econ_folder
 
     file = "cache/configuration.json"
     os.makedirs(os.path.dirname(file), exist_ok=True)
@@ -47,3 +52,8 @@ def get_branch_path():
 def get_migration_output_path():
     data = load()
     return data["migration_output_path"]
+
+
+def get_publish_output_path():
+    data = load()
+    return data["publish_output_path"]

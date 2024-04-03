@@ -6,7 +6,9 @@
                 "Trunk",
                 "current",
                 "ProtoGen",
-                "Plugin"
+                "Plugin",
+                "ThirdParty",
+                "SimpleTimerPortable"
             ]
         },
         "branches": {
