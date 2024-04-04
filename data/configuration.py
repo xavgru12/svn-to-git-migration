@@ -41,7 +41,7 @@ def get_base_server_url():
 
 def get_local_git_path():
     data = load()
-    return data["local_git_path"]
+    return data.get("local_git_path")
 
 
 def get_branch_path():
