@@ -34,7 +34,11 @@ def parse_external_info(data):
                 configuration.get_remote_url() + "/" + configuration.get_branch_path(),
                 base_folder,
             )
-            local_folder_path = configuration.get_local_git_path() + base_folder if configuration.get_local_git_path() else ""
+            local_folder_path = (
+                configuration.get_local_git_path() + base_folder
+                if configuration.get_local_git_path()
+                else ""
+            )
             remote_path = line_parser.parse_remote_path()
             commit_revision = line_parser.parse_commit_revision()
             name = line_parser.parse_name()

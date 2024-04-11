@@ -10,19 +10,19 @@ import output.printRepositoryData
 import output.branchConfiguration
 
 
-def migrate_svn_externals_to_git(remote_paths):
+def migrate_svn_externals_to_git(data_dict):
     print("check and write svn branch paths according to configuration ... ")
     branch_dict = dict()
-
-    for remote_path in remote_paths:
+    for repository in data_dict.values():
         output.branchConfiguration.set_repo_configuration_from(
-            remote_path, branch_dict
+            repository.remote_path, branch_dict
         )
-
     print("branch_dict:")
     print(200 * "-")
     output.printRepositoryData.print_info(branch_dict)
+    print("data_dict:")
     print(200 * "-")
+    output.printRepositoryData.print_info(data_dict)
     print()
     print("... done")
 
@@ -33,7 +33,7 @@ def migrate_svn_externals_to_git(remote_paths):
         migrate(branch_dict.values())
 
 
-def migrate_econ_folder(): #make this recursive
+def migrate_econ_folder():
     repository_paths = get_econ_repository_paths()
     print("econ folder repository paths:")
     print(repository_paths)
