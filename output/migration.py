@@ -8,6 +8,8 @@ import output.branchConfiguration
 import datetime
 import output.printRepositoryData
 import output.branchConfiguration
+import output.subprocess_execution
+import subprocess_execution
 
 
 def migrate_svn_externals_to_git(data_dict):
@@ -206,27 +208,7 @@ def execute_with_log(command, repo_name, local_repo_path):
             + "-" * 70
             + "\n"
         )
-        for log in execute(command, local_repo_path):
+        for log in output.subprocess_execution.continuous_execute(command, local_repo_path):
             print(f"{repo_name}: {append_log}: {log}")
             f.write(f"{append_log}: {log}")
             f.flush()
-
-
-def execute(command, external_source_path):
-    popen = subprocess.Popen(
-        command.split(),
-        stderr=subprocess.PIPE,
-        cwd=external_source_path,
-        creationflags=subprocess.REALTIME_PRIORITY_CLASS,
-        universal_newlines=True,
-    )
-    for stderr_line in iter(popen.stderr.readline, ""):
-        if stderr_line.strip() and stderr_line is not None:
-            yield stderr_line
-    popen.stderr.close()
-    return_code = popen.wait()
-    if return_code:
-        raise subprocess.CalledProcessError(
-            return_code,
-            f"{command} at {external_source_path} failed. Stop migration for this repository",
-        )
