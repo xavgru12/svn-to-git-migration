@@ -1,4 +1,5 @@
 import subprocess
+import sys
 
 def continuous_execute(command, external_source_path, std):
     std_types = ["stderr", "stdout"]
@@ -40,3 +41,12 @@ def continuous_execute(command, external_source_path, std):
             return_code,
             f"{command} at {external_source_path} failed.",
         )
+    
+def check_output_execute(command, working_directory):
+    if not isinstance(command, list):
+        command = command.split()
+    output = subprocess.check_output(
+        command, cwd=f"{working_directory}"
+    ).decode(sys.stdout.encoding)
+
+    return output
