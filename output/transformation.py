@@ -54,7 +54,6 @@ def transform_branches(repo_path):
     for line in subprocess_execution.continuous_execute(command_list, repo_path, "stdout"):
         if "@" not in line:
             line = line.replace("\n", "")
-            print(line)
 
             branch_pattern = "origin.*branches/"
             branch_command = get_line_as_branch_command(line, branch_pattern)
@@ -68,11 +67,10 @@ def transform_branches(repo_path):
                 tag_pattern = "origin.*distr/"
                 branch_command = get_line_as_branch_command(line, tag_pattern)
                 branches.append(branch_command) if branch_command is not None else None
-            print()
     
     #write branches to log file
     command = f"git push origin {" ".join(branches)}"
-    print(command)
+    print(f"push branches: {command}")
     subprocess_execution.check_output_execute(command, repo_path)
 
 
