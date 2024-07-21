@@ -208,7 +208,7 @@ def execute_with_log(command, repo_name, local_repo_path):
             + "-" * 70
             + "\n"
         )
-        for log in output.subprocess_execution.continuous_execute(command, local_repo_path):
+        for log in output.subprocess_execution.continuous_execute(command, local_repo_path, "stderr"):
             print(f"{repo_name}: {append_log}: {log}")
             f.write(f"{append_log}: {log}")
             f.flush()
