@@ -6,7 +6,7 @@ import pdb
 
 import subprocess_execution
 
-def on_rm_error( func, path, exc_info):
+def on_remove_error( func, path, exc_info):
     # path contains the path of the file that couldn't be removed
     # let's just assume that it's read-only and unlink it.
     os.chmod( path, stat.S_IWRITE )
@@ -19,7 +19,7 @@ def copy_repo_to_working_directory(repo_path):
     os.makedirs(destination, exist_ok=True)
 
     if os.path.isdir(destination_repo_path):
-        shutil.rmtree( destination_repo_path, onerror = on_rm_error )
+        shutil.rmtree(destination_repo_path, onexc = on_remove_error)
     shutil.copytree(repo_path, destination_repo_path)
 
     destination_path = os.path.join(destination, name)
@@ -70,6 +70,7 @@ def transform_branches(repo_path):
                 branches.append(branch_command) if branch_command is not None else None
             print()
     
+    #write branches to log file
     command = f"git push origin {" ".join(branches)}"
     print(command)
     subprocess_execution.check_output_execute(command, repo_path)
@@ -102,8 +103,6 @@ def transform_tags(repo_path):
         commit_hash = splitted_line[1]
         print(branch_name)
         print(commit_hash)
-
-    #write output of execution to a log file since this will be a very long file
 
 
 # git for-each-ref --format="%(refname:short) %(objectname)" refs/remotes/origin/tags \
