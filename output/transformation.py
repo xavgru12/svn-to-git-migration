@@ -48,7 +48,7 @@ def remove_remote_origin(repo_path):
     subprocess_execution.check_output_execute(command, repo_path)
 
 def transform_branches(repo_path):
-    
+
     command_list = ["git", "for-each-ref", "--format=%(refname:short)"]
     branches = []
     for line in subprocess_execution.continuous_execute(command_list, repo_path, "stdout"):
@@ -115,8 +115,10 @@ def transform_tags(repo_path):
 #         git branch -r -d $BRANCH
 #   done
 
+# skip delete branch part, not needed
+
 if __name__ == "__main__":
-    git_bridge_path = r"C:\localSharedPool\ag-curmit"
+    git_bridge_path = r"C:\localSharedPool\ag-mobile-app"
     working_directory = copy_repo_to_working_directory(git_bridge_path)
     print(f"working directory: {working_directory}")
     transform_git_bridge_to_native_git(working_directory)
