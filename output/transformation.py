@@ -49,12 +49,14 @@ def remove_remote_origin(repo_path):
 
 def transform_branches(repo_path):
 
+    #todo: remove mistaken branches eg: branches/release, get branches here and check inside get_line_as_branch_command
     command_list = ["git", "for-each-ref", "--format=%(refname:short)"]
     branches = []
     for line in subprocess_execution.continuous_execute(command_list, repo_path, "stdout"):
         if "@" not in line:
             line = line.replace("\n", "")
 
+            #todo: add pattern for all branch variations
             branch_pattern = "origin.*branches/"
             branch_command = get_line_as_branch_command(line, branch_pattern)
             branches.append(branch_command) if branch_command is not None else None
@@ -94,13 +96,36 @@ def transform_tags(repo_path):
     #distr in ag-curmit must be treated as branch, do not make git tags for it
     if "ag-curmit" in repo_path:
         return
-    command_list = ["git", "for-each-ref", "--format=%(refname:short) %(objectname)", "refs/remotes/origin/distr/*"]
+    
+    command_list = ["git", "for-each-ref", "--format=%(refname:short) %(objectname)"]
     for line in subprocess_execution.continuous_execute(command_list, repo_path, "stdout"):
-        splitted_line = line.split()
-        branch_name = splitted_line[0]
-        commit_hash = splitted_line[1]
-        print(branch_name)
-        print(commit_hash)
+        if "@" not in line:
+            splitted_line = line.split()
+            original_tag_name = splitted_line[0]
+            commit_hash = splitted_line[1]
+
+            #todo: add pattern for all tag variations
+            tag_pattern = "origin.*tags/"
+            found_pattern = find(tag_pattern, original_tag_name)
+            if found_pattern is not None:
+                tag_name = original_tag_name.replace(found_pattern, "")
+                create_local_git_tag(commit_hash, tag_name, repo_path)
+    
+    push_local_git_tags(repo_path)
+
+
+
+def create_local_git_tag(commit_hash, tag_name, repo_path):
+    description_command = ["git", "log", "-1", "--format=format:%B", commit_hash]
+    description = subprocess_execution.check_output_execute(description_command, repo_path)
+    tag_command = ["git", "tag", "-a", "-m", f"{description}", tag_name, commit_hash]
+    print(f"{" ".join(tag_command)}")
+    subprocess_execution.check_output_execute(tag_command, repo_path)
+
+    
+def push_local_git_tags(repo_path):
+    command = "git push origin --tags"
+    subprocess_execution.check_output_execute(command, repo_path)
 
 
 # git for-each-ref --format="%(refname:short) %(objectname)" refs/remotes/origin/tags \
