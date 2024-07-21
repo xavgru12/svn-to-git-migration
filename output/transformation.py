@@ -50,31 +50,39 @@ def remove_remote_origin(repo_path):
 def transform_branches(repo_path):
     
     command_list = ["git", "for-each-ref", "--format=%(refname:short)"]
+    branches = []
     for line in subprocess_execution.continuous_execute(command_list, repo_path, "stdout"):
         if "@" not in line:
             line = line.replace("\n", "")
             print(line)
+
             branch_pattern = "origin.*branches/"
-            transform_line_as_branch(line, branch_pattern, repo_path)
+            branch_command = get_line_as_branch_command(line, branch_pattern)
+            branches.append(branch_command) if branch_command is not None else None
 
             trunk_pattern = "origin.*trunk"
-            transform_line_as_branch(line, trunk_pattern, repo_path)
+            branch_command = get_line_as_branch_command(line, trunk_pattern)
+            branches.append(branch_command) if branch_command is not None else None
 
             if "ag-curmit" in repo_path:
                 tag_pattern = "origin.*distr/"
-                transform_line_as_branch(line, tag_pattern, repo_path)
+                branch_command = get_line_as_branch_command(line, tag_pattern)
+                branches.append(branch_command) if branch_command is not None else None
             print()
-    #git push origin all found branches
+    
+    command = f"git push origin {" ".join(branches)}"
+    print(command)
+    subprocess_execution.check_output_execute(command, repo_path)
 
-def transform_line_as_branch(line, pattern, repo_path):
+
+def get_line_as_branch_command(line, pattern):
     found_pattern = find(pattern, line)
     if found_pattern is not None:
         remote_part = line.replace(found_pattern, "")
         if "trunk" in found_pattern:
             remote_part= "main"
-        command = f"git push origin refs/remotes/{line}:refs/heads/{remote_part}"
-        print(command)
-        subprocess_execution.check_output_execute(command, repo_path)
+        command = f"refs/remotes/{line}:refs/heads/{remote_part}"
+        return command
 
 
 def find(pattern, line):
