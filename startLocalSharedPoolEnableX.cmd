@@ -1,0 +1,1 @@
+enableX.cmd --migrate

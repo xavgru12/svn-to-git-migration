@@ -7,48 +7,112 @@ import sys
 import output.branchConfiguration
 import datetime
 import output.printRepositoryData
-import output.branchConfiguration
+import parser.branchConfigurationParser
+import model.svnRepositoryModel
 
 
-def migrate_svn_externals_to_git(data_dict):
+def migrate_svn_externals_to_git(remote_paths, logger):
     print("check and write svn branch paths according to configuration ... ")
     branch_dict = dict()
-    for repository in data_dict.values():
-        output.branchConfiguration.set_repo_configuration_from(
-            repository.remote_path, branch_dict
-        )
+
+    for remote_path in remote_paths:
+        output.branchConfiguration.set_repo_configuration_from(remote_path, branch_dict)
+
     print("branch_dict:")
     print(200 * "-")
-    output.printRepositoryData.print_info(branch_dict)
-    print("data_dict:")
+    output.printRepositoryData.print_info(branch_dict, logger)
     print(200 * "-")
-    output.printRepositoryData.print_info(data_dict)
     print()
     print("... done")
 
-    if confirm(
-        "This process takes one day to finish. Preferably copy and paste the already migrated repositories. "
-        "Do you still want to continue?"
-    ):
-        migrate(branch_dict.values())
+    migrate(branch_dict.values())
 
 
 def migrate_econ_folder():
     repository_paths = get_econ_repository_paths()
     print("econ folder repository paths:")
     print(repository_paths)
-    branch_dict = dict()
-    for path in repository_paths:
-        output.branchConfiguration.set_repo_configuration_from(path, branch_dict)
-    print("branch dict")
-    for repo in branch_dict.values():
-        print(repo)
+    trees = create_econ_repository_trees(repository_paths)
+    for tree in trees:
+        tree.parse_recursively()
+        # print(f"tree: {tree.recursive_list.current.folder_name}")
 
-    if confirm(
-        "This process takes one day to finish. Preferably copy and paste the already migrated repositories. "
-        "Do you still want to continue?"
-    ):
-        migrate(branch_dict.values())
+    for tree in trees:
+        print(f"tree: {tree.recursive_list.current.folder_name}")
+        tree.print_tree()
+
+    print("migrate repositories recursively")
+    for tree in trees:
+        tree.migrate_repositories_recursively()
+
+    # this will be a new function: checkout_econ_folder
+    # print("checkout git repositories recursively...")
+    # for tree in trees:
+    #     tree.checkout_git_repositories_recursively()
+
+
+def create_econ_repository_trees(repository_paths):
+    repository_trees = []
+
+    for path in repository_paths:
+        tree = create_tree(path)
+        repository_trees.append(tree)
+
+    return repository_trees
+
+
+def create_tree(path):
+    remote_path = path
+
+    name = parser.branchConfigurationParser.parse_repo_name(remote_path)
+
+    local_path = configuration.get_local_path()
+    local_path = os.path.join(local_path, name)
+    print(f"local_path: {local_path}")
+
+    branch_name = get_trunk_branch_name(remote_path)
+
+    top = model.svnRepositoryModel.SvnRepositoryModel(
+        name, "", local_path, remote_path, branch_name, ""
+    )
+    # branch_name retrieved from branch_dict
+
+    tree = output.repositoryTree.RepositoryTree(top)
+    return tree
+
+
+def get_trunk_branch_name(remote_path):
+    branch_configuration = parser.branchConfigurationParser.parse()
+
+    trunk_names = branch_configuration["generic"]["trunk"]["folders"]
+
+    found_trunk = []
+    for name in trunk_names:
+        inside_path = False
+        if remote_path.endswith(name):
+            branch = remote_path
+            inside_path = True
+        else:
+            branch = f"/{remote_path}/{name}"
+
+        branch_url = f"{configuration.get_base_server_url()}/{branch}"
+        if output.branchConfiguration.check_for_existence(branch_url) is True:
+            if inside_path:
+                found_trunk.append("")
+            else:
+                found_trunk.append(name)
+
+    if len(found_trunk) > 1:
+        raise Exception(
+            f"found several possible branch names for trunk in top repository of repository tree: {found_trunk}"
+        )
+
+    if not found_trunk:
+        raise Exception(
+            f"no trunk found for top repository of repository tree: {remote_path}"
+        )
+
+    return found_trunk[0]
 
 
 def get_econ_repository_paths():
@@ -103,21 +167,6 @@ def add_path(repositories, path):
         repositories[index] = f"{path}/{repository}".replace(
             f"{configuration.get_base_server_url()}/", ""
         )
-
-
-def confirm(prompt):
-    """Prompts for yes or no response from the user. Returns True for yes and
-    False for no.
-
-    """
-    while True:
-        ans = input(prompt + " [y/n]: ")
-        if ans.lower() == "y":
-            return True
-        elif ans.lower() == "n":
-            return False
-        else:
-            print("Please enter y or n.")
 
 
 def migrate(repositories):
@@ -186,7 +235,7 @@ def set_repository_configuration(data, external_source_path):
 
 
 def execute_with_log(command, repo_name, local_repo_path):
-    file = f"logs/{repo_name}.txt"
+    file = f"logs/migration/{repo_name}.txt"
     time = "{date:%d-%m-%Y_%H-%M-%S}".format(date=datetime.datetime.now())
     append_log = ""
     if "fetch" in command:

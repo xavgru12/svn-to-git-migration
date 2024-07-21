@@ -7,8 +7,8 @@ def write(args):
     args.migrate_econ_folder
     if args.remote_url:
         configuration["remote_url"] = args.remote_url
-    if args.local_git_path:
-        configuration["local_git_path"] = args.local_git_path
+    if args.local_path:
+        configuration["local_path"] = args.local_path
     configuration["base_server_url"] = args.base_server_url
     configuration["branch_path"] = args.branch_path
     configuration["migration_output_path"] = args.migration_output_path
@@ -39,9 +39,9 @@ def get_base_server_url():
     return data["base_server_url"]
 
 
-def get_local_git_path():
+def get_local_path():
     data = load()
-    return data.get("local_git_path")
+    return data.get("local_path")
 
 
 def get_branch_path():

@@ -1,3 +1,3 @@
-def print_info(data_dict):
+def print_info(data_dict, logger):
     for _, data in data_dict.items():
-        print(data)
+        logger.debug(data)

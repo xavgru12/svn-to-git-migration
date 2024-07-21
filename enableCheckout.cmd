@@ -1,1 +1,1 @@
-python svnExternals.py --local-git-path %1 --remote-url http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1 --checkout %2 %3 %4 %5
+python svnExternals.py --local-path %1 --remote-url http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1 --checkout-svn %2 %3 %4 %5

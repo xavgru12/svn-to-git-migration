@@ -17,6 +17,8 @@ def parse_repo_name(remote_path):
         return "ag-nor-image-creator"
     elif name == "CuRMiT":
         return "ag-curmit"
+    elif name == "eX1":
+        return "ag-system-firmware"
     replace_underscore = name.replace("_", "-")
     replace_capitals = replace_capitals_with_lower_case_dash(replace_underscore)
 
@@ -27,6 +29,7 @@ def parse_repo_name(remote_path):
     )
     repo_name = replace_stm_string.replace("--", "-")
     ag_repo_name = "ag-" + repo_name
+    ag_repo_name = ag_repo_name.replace(" ", "")
     return ag_repo_name
 
 

@@ -8,7 +8,8 @@
                 "ProtoGen",
                 "Plugin",
                 "ThirdParty",
-                "SimpleTimerPortable"
+                "SimpleTimerPortable",
+                "Uid"
             ]
         },
         "branches": {
@@ -33,6 +34,7 @@
         "tags": {
             "folders": [
                 "tags",
+                "tag",
                 "distribution",
                 "distr"
             ],
