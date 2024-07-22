@@ -32,4 +32,7 @@ Sylaa = Syla Alanda <alanda.syla@curtis.ch>
 lehmannm = Lehmann Martin <martin.lehmann@curtis.ch>
 gerberk = Gerber Klaus <klaus.gerber@curtis.ch>
 furrere = Furrer E <furrere@email.com>
+grossenbacherf = Grossenbacher Fabian <fabian.grossenbacher@curtis.ch>
+burrib = Burri Benno <benno.burri@curtis.ch>
+kurzent = Kurzen Thomas <thomas.kurzen@curtis.ch>
 (no author) = gitsvn <gitsvn@gitsvn.com>

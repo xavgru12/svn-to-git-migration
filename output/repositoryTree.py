@@ -1,0 +1,132 @@
+from __future__ import annotations
+from typing import Any
+from typing import Optional
+import os
+import model.svnRepositoryModel
+import parser.svnRepositoryParser
+import data.configuration as configuration
+import output.gitCheckout
+import output.migration
+import output.logger
+
+
+class RecursiveList:
+    def __init__(
+        self,
+        current: Optional[model.svnRepositoryModel.SvnRepositoryModel],
+        dependencies: Optional[RecursiveList],
+    ) -> None:
+        """Initialize a new recursive list."""
+        self.current = current
+        self.dependencies = dependencies
+
+    def parse_externals(self, current_folder_path=None):
+        if current_folder_path is None:
+            current_folder_path = self.current.local_folder_path
+
+        logger = output.logger.LoggerFactory.create("logger")
+        logger.debug(self.current)
+        branch_dict = parser.svnRepositoryParser.parse(
+            f"{configuration.get_base_server_url()}/{self.current.remote_path}/{self.current.branch_name}",
+            current_folder_path,
+            self.current.commit_revision,
+        )
+        self.dependencies = []
+        for dependency in branch_dict.values():
+            self.dependencies.append(RecursiveList(dependency, (None, None)))
+
+        for repository in self.dependencies:
+            dependency_folder_path = f"{current_folder_path}{repository.current.base_folder}/{repository.current.folder_name}"
+            repository.parse_externals(dependency_folder_path)
+
+    def get_remote_paths(self, remote_paths, iterator=None):
+        if iterator is None:
+            iterator = [self]
+            remote_paths.append(self.current.remote_path)
+
+        for recursive_list in iterator:
+            for dependency in recursive_list.dependencies:
+                path = dependency.current.remote_path
+                if path not in remote_paths:
+                    remote_paths.append(dependency.current.remote_path)
+
+            self.get_remote_paths(remote_paths, recursive_list.dependencies)
+
+    def print(self, iterator=None):
+        if iterator is None:
+            iterator = [self]
+
+        for recursive_list in iterator:
+            name = self.current.folder_name.replace("/", "_")
+            log_name = f"logs/repositoryTrees/{name}"
+            os.makedirs(os.path.dirname(log_name), exist_ok=True)
+            logger = output.logger.LoggerFactory.create(
+                f"{name}-logger", f"{log_name}.log"
+            )
+            logger.debug(50 * "-" + "\n")
+            logger.debug(f"current:\n {recursive_list.current},\n dependencies: ")
+            for repository in recursive_list.dependencies:
+                logger.debug(f"{repository.current}")
+            logger.debug(50 * "-" + "\n")
+            self.print(recursive_list.dependencies)
+
+    def checkout_git_repositories(
+        self, remote_paths, iterator=None
+    ):  # remote_paths is not needed at all for git checkout
+        if iterator is None:
+            iterator = [self]
+            print(
+                f"checkout git top: {iterator[0].current.remote_path}"
+            )  # self.current.remote_path
+            output.gitCheckout.checkout(self.current)
+            print()
+
+        for recursive_list in iterator:
+            for dependency in recursive_list.dependencies:
+                print(f"checkout git: {dependency.current.remote_path}")
+                output.gitCheckout.checkout(dependency.current)
+                print()
+
+            self.checkout_git_repositories(remote_paths, recursive_list.dependencies)
+
+    def migrate_repositories(self, remote_paths):
+        name = self.current.folder_name.replace("/", "_")
+        log_name = f"logs/branchModels/{name}"
+        os.makedirs(os.path.dirname(log_name), exist_ok=True)
+        logger = output.logger.LoggerFactory.create(
+            f"{name}-branchmodel", f"{log_name}.log"
+        )
+
+        output.migration.migrate_svn_externals_to_git(remote_paths, logger)
+
+
+class RepositoryTree:
+    recursive_list = Optional[RecursiveList]
+    top = Optional[model.svnRepositoryModel.SvnRepositoryModel]
+
+    def __init__(self, top):
+        self.top = top
+        self.remote_paths = []
+
+    def parse_recursively(self):
+        self.recursive_list = RecursiveList(self.top, (None, None))
+        self.recursive_list.parse_externals()
+
+    def print_tree(self):
+        self.recursive_list.print()
+
+    def get_list_of_remote_paths_recursively(self):
+        self.recursive_list.get_remote_paths(self.remote_paths)
+        return self.remote_paths
+
+    def checkout_git_repositories_recursively(self):
+        if not self.remote_paths:
+            self.get_list_of_remote_paths_recursively()
+
+        self.recursive_list.checkout_git_repositories(self.remote_paths)
+
+    def migrate_repositories_recursively(self):
+        if not self.remote_paths:
+            self.get_list_of_remote_paths_recursively()
+
+        self.recursive_list.migrate_repositories(self.remote_paths)

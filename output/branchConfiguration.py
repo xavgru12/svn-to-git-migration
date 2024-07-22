@@ -43,6 +43,8 @@ def add_folders(folders, branch_type, remote_path):
     branch_list = []
 
     for folder in folders:
+        if folder == "Uid" and "LogicalComponents (obsolete)/Uid" in remote_path:
+            continue
         if remote_path.endswith(folder):
             branch = remote_path
         else:
@@ -110,10 +112,8 @@ def build_ignore_ref_string(ignore_refs, branch_type, remote_part):
 
 def set_repo_configuration_from(remote_path, branch_dict):
     if remote_path not in branch_dict:
-        repo_name = parser.branchConfigurationParser.parse_repo_name(
-            remote_path
-        )  # parse repo name is not needed in lineparser, since branch_dict uses remote_path as input
-        print(repo_name)
+        repo_name = parser.branchConfigurationParser.parse_repo_name(remote_path)
+        print(f"{remote_path}: {repo_name}")
         data = model.branchModel.BranchModel(repo_name, remote_path)
         data.branches = []
         data.ignore_refs = []

@@ -11,9 +11,14 @@ def parse():
         "--create-gitignore", action="store_true", help="Create a .gitignore file."
     )
     parser.add_argument(
-        "--checkout",
+        "--checkout-svn",
         action="store_true",
         help="Checkout svn externals recursively inside git.",
+    )
+    parser.add_argument(
+        "--checkout-git",
+        action="store_true",
+        help="Checkout the top repository including all external git repositories recursively.",
     )
     parser.add_argument(
         "--migrate",
@@ -38,9 +43,7 @@ def parse():
     parser.add_argument(
         "--print", action="store_true", help="Print collected data of externals."
     )
-    parser.add_argument(
-        "--local-git-path", help="Specify path to local git repository."
-    )
+    parser.add_argument("--local-path", help="Specify path to local git repository.")
     parser.add_argument(
         "--migration-output-path",
         default="C:\\localSharedPool",
@@ -64,11 +67,9 @@ def parse():
         if args.remote_url is None:
             parser.error("--remote-url missing")
 
-    if args.checkout or args.create_gitignore:
-        if args.local_git_path is None:
-            parser.error("--local-git-path missing")
-        if not os.path.isdir(f"{args.local_git_path}/.git"):
-            raise argparse.ArgumentTypeError("path to local git repository is wrong")
+    if args.checkout_svn or args.create_gitignore or args.checkout_git:
+        if args.local_path is None:
+            parser.error("--local-path missing")
 
     configuration.write(args)
 
