@@ -8,7 +8,8 @@ import data.configuration as configuration
 import output.gitCheckout
 import output.migration
 import output.logger
-#import output.external_subfolder_migration
+
+# import output.external_subfolder_migration
 import parser.branchConfigurationParser
 import output.transformation
 

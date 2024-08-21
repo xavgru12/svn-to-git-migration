@@ -62,13 +62,15 @@ def transform_git_bridge_to_native_git(repo_path):
     repo_name = create_repo_name(repo_path)
     add_remote_origin(repo_name, repo_path)
     check_remote_origin_exists(repo_path)
-    branches_with_subfolders = (
-        parser.branchConfigurationParser.get_all_folders_with_subfolders_variations_as_list()
+    branches_with_subfolders = parser.branchConfigurationParser.get_all_folders_with_subfolders_variations_as_list()
+    branch_top_folders = (
+        parser.branchConfigurationParser.get_all_branch_top_folders_as_list()
     )
-    branch_top_folders = parser.branchConfigurationParser.get_all_branch_top_folders_as_list()
     tag_top_folders = parser.branchConfigurationParser.get_all_tag_top_folders_as_list()
     tag_sub_folders = parser.branchConfigurationParser.get_all_tag_sub_folders_as_list()
-    all_trunk_variations = parser.branchConfigurationParser.get_all_trunk_variations_as_list()
+    all_trunk_variations = (
+        parser.branchConfigurationParser.get_all_trunk_variations_as_list()
+    )
     transform_branches(
         repo_path, branches_with_subfolders, all_trunk_variations, branch_top_folders
     )

@@ -19,7 +19,7 @@ def fetch():
         if ".txt" not in repository_name
     ]
 
-    #debug
+    # debug
     # for repository in repository_names:
     #     output.migration.migrate_each(repository)
     with multiprocessing.Pool() as pool:

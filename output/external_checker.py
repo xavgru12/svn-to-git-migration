@@ -4,7 +4,9 @@ import parser.branchConfigurationParser
 
 
 def is_type_external_subfolders(branch_name):
-    possible_branch_names = parser.branchConfigurationParser.get_all_variations_as_list()
+    possible_branch_names = (
+        parser.branchConfigurationParser.get_all_variations_as_list()
+    )
     for possible_branch_name in possible_branch_names:
         if possible_branch_name == branch_name:
             return None
@@ -22,7 +24,9 @@ def is_type_external_subfolders(branch_name):
 
 
 def find_most_suitable_branch_name(branch_name):
-    possible_branch_names = parser.branchConfigurationParser.get_all_variations_as_list()
+    possible_branch_names = (
+        parser.branchConfigurationParser.get_all_variations_as_list()
+    )
     for possible_branch_name in possible_branch_names:
         if possible_branch_name in branch_name:
             return possible_branch_name
