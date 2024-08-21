@@ -17,7 +17,7 @@ def publish():
 
 def zip_repositories_at(repository_path):
     for name in os.listdir(repository_path):
-        if not name.endswith(".zip"):
+        if not name.endswith(".zip") and not name.endswith(".txt"):
             dir = os.path.join(repository_path, name)
             print(f"zipped: {dir}")
             shutil.make_archive(dir, "zip", dir)
@@ -71,14 +71,3 @@ def delete_zips_at(cwd_path):
         if name.endswith(".zip"):
             zipped = os.path.join(cwd_path, name)
             os.remove(zipped)
-
-
-if __name__ == "__main__":
-    timestamp = get_timestamp()
-    with open(os.path.join(os.getcwd(), "timestamp.txt"), "w+") as f:
-        f.write(timestamp)
-
-    with open(os.path.join(os.getcwd(), "timestamp.txt"), "r") as f:
-        timestamp = f.readlines()[0]
-
-    print(timestamp)

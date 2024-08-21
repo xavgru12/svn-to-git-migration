@@ -16,6 +16,10 @@ class LineParser:
                 generic_configuration[branch_type]["folders"]
             )
 
+        self.repositories_without_trunk_branch = branch_configuration[
+            "repositoriesWithoutBranches"
+        ]
+
     def is_line_with_new_base_folder(self):
         if " - ^" in self.line or " - " in self.line:
             return True
@@ -26,6 +30,10 @@ class LineParser:
         for branch_name in self.possible_branch_names:
             if branch_name in line:
                 return line.split(f"/{branch_name}")[0]
+
+        for remote_path in self.repositories_without_trunk_branch:
+            if remote_path in line:
+                return remote_path
 
         raise Exception(f"branch name analysis failed: line: {line}")
 
@@ -99,3 +107,9 @@ class LineParser:
             if branch_name in line:
                 modified_line = branch_name + line.split(branch_name)[1]
                 return modified_line
+
+        for remote_path in self.repositories_without_trunk_branch:
+            if remote_path in line:
+                branch = line.replace(f"{remote_path}", "")
+                branch = branch[1:] if branch.startswith("/") else branch
+                return branch

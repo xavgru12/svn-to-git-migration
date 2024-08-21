@@ -2,6 +2,8 @@ import os
 import parser.branchConfigurationParser
 import data.configuration as configuration
 import shutil
+import output.external_checker
+import output.shutil_execute
 
 
 def checkout(repository):
@@ -10,22 +12,33 @@ def checkout(repository):
     """
 
     destination_directory = set_destination_directory(repository)
+    if not output.external_checker.is_type_external_subfolders(repository.branch_name):
+        repo_name = parser.branchConfigurationParser.parse_repo_name(
+            repository.remote_path
+        )
+    else:
+        name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+        branch_name = repository.branch_name.replace("/", "-")
+        repo_name = f"{name}_{branch_name}_subfolder-external"
 
-    repo_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+    # output.external_subfolder_migration.migrate(repositories)
+    # only works in pure git repositories, does not work in git svn
+    # check here for remote_path and if longer than trunk/ etc then parse repo name from branchName, not remote path. git clone from online repository
+
     print(f"repo_name: {repo_name}")
 
     zip_file = f"{repo_name}.zip"
-    zip_file_path = create_zip_file_path(zip_file)
-    print(f"zip_file_path: {zip_file_path}")
+    zip_file_source_path = create_zip_file_path(zip_file)
+    print(f"zip_file_path: {zip_file_source_path}")
     print(f"destination_directory: {destination_directory}")
 
-    shutil.copy(zip_file_path, destination_directory)
+    shutil.copy(zip_file_source_path, destination_directory)
 
-    local_zip = os.path.join(destination_directory, zip_file)
-    if not os.path.isfile(local_zip):
-        raise FileNotFoundError(local_zip)
+    zip_file_destination_path = os.path.join(destination_directory, zip_file)
+    if not os.path.isfile(zip_file_destination_path):
+        raise FileNotFoundError(zip_file_destination_path)
 
-    extract(local_zip, destination_directory)
+    output.shutil_execute.extract(zip_file_destination_path, destination_directory)
 
     # prefer commit, if commit is not available take branch
     if repository.commit_revision:
@@ -55,8 +68,3 @@ def set_destination_directory(repository):
 
     os.makedirs(destination_directory, exist_ok=True)
     return destination_directory
-
-
-def extract(zip_file, destination):
-    shutil.unpack_archive(zip_file, destination)
-    os.remove(zip_file)

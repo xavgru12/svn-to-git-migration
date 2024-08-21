@@ -7,8 +7,11 @@ import sys
 import output.branchConfiguration
 import datetime
 import output.printRepositoryData
+import output.subprocess_execution
 import parser.branchConfigurationParser
 import model.svnRepositoryModel
+import output.shutil_execute
+import output.transformation
 
 
 def migrate_svn_externals_to_git(remote_paths, logger):
@@ -35,7 +38,6 @@ def migrate_econ_folder():
     trees = create_econ_repository_trees(repository_paths)
     for tree in trees:
         tree.parse_recursively()
-        # print(f"tree: {tree.recursive_list.current.folder_name}")
 
     for tree in trees:
         print(f"tree: {tree.recursive_list.current.folder_name}")
@@ -51,6 +53,32 @@ def migrate_econ_folder():
     #     tree.checkout_git_repositories_recursively()
 
 
+def upload_econ_folder():
+    repository_paths = get_econ_repository_paths()
+    print("econ folder repository paths:")
+    print(repository_paths)
+    trees = create_econ_repository_trees(repository_paths)
+    for tree in trees:
+        tree.parse_recursively()
+
+    for tree in trees:
+        print(f"tree: {tree.recursive_list.current.folder_name}")
+        tree.print_tree()
+
+    repository_names = []
+    for tree in trees:
+        list_of_names = tree.get_list_of_repository_names_recursively()
+        repository_names.extend(list_of_names)
+
+    removed_duplicate_repositories = list(set(repository_names))
+    output.transformation.upload(removed_duplicate_repositories)
+
+    # comment external subfolder migration for now
+    # for tree in trees:
+    #     repositories = tree.get_list_of_repositories_recursively()
+    #     output.external_subfolder_migration.migrate(repositories)
+
+
 def create_econ_repository_trees(repository_paths):
     repository_trees = []
 
@@ -61,9 +89,7 @@ def create_econ_repository_trees(repository_paths):
     return repository_trees
 
 
-def create_tree(path):
-    remote_path = path
-
+def create_tree(remote_path):
     name = parser.branchConfigurationParser.parse_repo_name(remote_path)
 
     local_path = configuration.get_local_path()
@@ -86,21 +112,23 @@ def get_trunk_branch_name(remote_path):
 
     trunk_names = branch_configuration["generic"]["trunk"]["folders"]
 
+    repositories_without_trunk_branch = branch_configuration[
+        "repositoriesWithoutBranches"
+    ]
+
+    for repository in repositories_without_trunk_branch:
+        if repository == remote_path:
+            branch_url = f"{configuration.get_base_server_url()}/{remote_path}"
+            if output.branchConfiguration.check_for_existence(branch_url) is True:
+                return ""
+
     found_trunk = []
     for name in trunk_names:
-        inside_path = False
-        if remote_path.endswith(name):
-            branch = remote_path
-            inside_path = True
-        else:
-            branch = f"/{remote_path}/{name}"
+        branch = f"/{remote_path}/{name}"
 
         branch_url = f"{configuration.get_base_server_url()}/{branch}"
         if output.branchConfiguration.check_for_existence(branch_url) is True:
-            if inside_path:
-                found_trunk.append("")
-            else:
-                found_trunk.append(name)
+            found_trunk.append(name)
 
     if len(found_trunk) > 1:
         raise Exception(
@@ -173,8 +201,12 @@ def migrate(repositories):
     for repository in repositories:
         init_each(repository)
 
+    repository_names = []
+    for repository in repositories:
+        repository_names.append(repository.repo_name)
+
     with multiprocessing.Pool() as pool:
-        for result in pool.imap(migrate_each, repositories):
+        for result in pool.imap(migrate_each, repository_names):
             if isinstance(result, Exception):
                 print("Got exception: {}".format(result))
         pool.close()
@@ -193,21 +225,17 @@ def init_each(repository):
         set_repository_configuration(repository, external_source_path)
 
 
-def migrate_each(repository):
-    print(f"Started git migration for: {repository.repo_name}")
+def migrate_each(repository_name):
+    print(f"Started git migration for: {repository_name}")
 
     external_source_path = (
-        f"{configuration.get_migration_output_path()}/{repository.repo_name}"
+        f"{configuration.get_migration_output_path()}/{repository_name}"
     )
 
-    # remove NORImageCreator since it triggers http://ag-reposerver/repo/Projects/enAbleX1/SW/HC-Q,
-    # who needs NORImageCreator anyways?
-    # modify remotepath to Projects/enAbleX1/SW/HC-Q/trunk/Tools/NORImageCreator in order to prevent to migrate hc-q
-    if "NORImageCreator" != repository.repo_name:
-        fetch_command = "git svn fetch --quiet --quiet"
-        execute_with_log(fetch_command, repository.repo_name, external_source_path)
+    fetch_command = "git svn fetch --quiet --quiet"
+    execute_with_log(fetch_command, repository_name, external_source_path)
 
-    print(f"Ended git migration for: {repository.repo_name}")
+    print(f"Ended git migration for: {repository_name}")
 
 
 def set_repository_configuration(data, external_source_path):
@@ -255,27 +283,51 @@ def execute_with_log(command, repo_name, local_repo_path):
             + "-" * 70
             + "\n"
         )
-        for log in execute(command, local_repo_path):
+        for log in output.subprocess_execution.continuous_execute(
+            command, local_repo_path, "stderr"
+        ):
             print(f"{repo_name}: {append_log}: {log}")
             f.write(f"{append_log}: {log}")
             f.flush()
 
 
-def execute(command, external_source_path):
-    popen = subprocess.Popen(
-        command.split(),
-        stderr=subprocess.PIPE,
-        cwd=external_source_path,
-        creationflags=subprocess.REALTIME_PRIORITY_CLASS,
-        universal_newlines=True,
+def reset_migration_output_path():
+    migration_output_path = configuration.get_migration_output_path()
+    print(f"delete migration output path: {migration_output_path}")
+    output.shutil_execute.delete(migration_output_path)
+
+    publish_output_path = configuration.get_publish_output_path()
+    latest_publish_path = os.path.join(publish_output_path, "latest")
+
+    print("copy published repositories to migration output path")
+    copy_published_repositories_to_migration_output_path(
+        latest_publish_path, migration_output_path
     )
-    for stderr_line in iter(popen.stderr.readline, ""):
-        if stderr_line.strip() and stderr_line is not None:
-            yield stderr_line
-    popen.stderr.close()
-    return_code = popen.wait()
-    if return_code:
-        raise subprocess.CalledProcessError(
-            return_code,
-            f"{command} at {external_source_path} failed. Stop migration for this repository",
-        )
+
+
+def copy_published_repositories_to_migration_output_path(
+    latest_publish_path, migration_output_path
+):
+    copy(latest_publish_path, migration_output_path)
+    unzip(migration_output_path)
+
+
+def copy(latest_publish_path, migration_output_path):
+    os.makedirs(migration_output_path, exist_ok=True)
+    for zip_file in os.listdir(latest_publish_path):
+        if zip_file.endswith(".zip"):
+            print(f"copy: {zip_file}")
+            source_zip_file_path = os.path.join(latest_publish_path, zip_file)
+            destination_zip_file_path = os.path.join(migration_output_path, zip_file)
+            shutil.copyfile(source_zip_file_path, destination_zip_file_path)
+
+
+def unzip(directory):
+    repositories = os.listdir(directory)
+    for repository in repositories:
+        if repository.endswith(".zip"):
+            print(f"unzip: {repository}")
+            repository_folder = repository.replace(".zip", "")
+            new_repository_path = os.path.join(directory, repository_folder)
+            zip_file_path = os.path.join(directory, repository)
+            output.shutil_execute.extract(zip_file_path, new_repository_path)

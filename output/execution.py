@@ -10,15 +10,20 @@ import data.configuration as configuration
 import output.repositoryTree
 import model.svnRepositoryModel
 import output.logger
+import output.fetch
 
 
 def execute(arguments):
+    if arguments.reset_migration_output_path:
+        print("reset migration output path...")
+        migration.reset_migration_output_path()
     if (
         arguments.print
         or arguments.create_gitignore
         or arguments.checkout_svn
         or arguments.checkout_git
         or arguments.migrate
+        or arguments.upload_no_externals
     ):
         remote_path = configuration.get_remote_url().replace(
             f"{configuration.get_base_server_url()}/", ""
@@ -41,7 +46,8 @@ def execute(arguments):
         tree.parse_recursively()
         tree.print_tree()
 
-        remote_paths = tree.get_list_of_remote_paths_recursively()
+    if arguments.fetch_and_publish_all:
+        output.fetch.fetch_and_publish_all()
 
     if arguments.print:
         tree.print_tree()
@@ -58,15 +64,16 @@ def execute(arguments):
         tree.checkout_git_repositories_recursively()
 
     if arguments.migrate:
-        log_name = f"logs/branchModels/{name}"
-        os.makedirs(os.path.dirname(log_name), exist_ok=True)
-        logger = output.logger.LoggerFactory.create(
-            f"{name}-branchmodel", f"{log_name}.log"
-        )
-        migration.migrate_svn_externals_to_git(remote_paths, logger)
+        tree.migrate_repositories_recursively()
+
+    if arguments.upload_no_externals:
+        tree.upload_repositories_recursively()
 
     if arguments.publish:
         output.publish.publish()
 
     if arguments.migrate_econ_folder:
         migration.migrate_econ_folder()
+
+    if arguments.upload_econ_folder:
+        migration.upload_econ_folder()

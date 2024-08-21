@@ -8,6 +8,9 @@ import data.configuration as configuration
 import output.gitCheckout
 import output.migration
 import output.logger
+#import output.external_subfolder_migration
+import parser.branchConfigurationParser
+import output.transformation
 
 
 class RecursiveList:
@@ -26,8 +29,14 @@ class RecursiveList:
 
         logger = output.logger.LoggerFactory.create("logger")
         logger.debug(self.current)
+
+        if self.current.branch_name is not None:
+            branch_name = f"/{self.current.branch_name}"
+        else:
+            branch_name = ""
+
         branch_dict = parser.svnRepositoryParser.parse(
-            f"{configuration.get_base_server_url()}/{self.current.remote_path}/{self.current.branch_name}",
+            f"{configuration.get_base_server_url()}/{self.current.remote_path}{branch_name}",
             current_folder_path,
             self.current.commit_revision,
         )
@@ -51,6 +60,17 @@ class RecursiveList:
                     remote_paths.append(dependency.current.remote_path)
 
             self.get_remote_paths(remote_paths, recursive_list.dependencies)
+
+    def get_repositories(self, repositories, iterator=None):
+        if iterator is None:
+            iterator = [self]
+            repositories.append(self.current)
+
+        for recursive_list in iterator:
+            for dependency in recursive_list.dependencies:
+                repositories.append(dependency.current)
+
+            self.get_repositories(repositories, recursive_list.dependencies)
 
     def print(self, iterator=None):
         if iterator is None:
@@ -78,6 +98,7 @@ class RecursiveList:
             print(
                 f"checkout git top: {iterator[0].current.remote_path}"
             )  # self.current.remote_path
+            # need to inverse the recursive list here
             output.gitCheckout.checkout(self.current)
             print()
 
@@ -89,7 +110,7 @@ class RecursiveList:
 
             self.checkout_git_repositories(remote_paths, recursive_list.dependencies)
 
-    def migrate_repositories(self, remote_paths):
+    def migrate_repositories(self, remote_paths, repositories):
         name = self.current.folder_name.replace("/", "_")
         log_name = f"logs/branchModels/{name}"
         os.makedirs(os.path.dirname(log_name), exist_ok=True)
@@ -99,6 +120,12 @@ class RecursiveList:
 
         output.migration.migrate_svn_externals_to_git(remote_paths, logger)
 
+    def upload_repositories(self, repository_names, repositories):
+        output.transformation.upload(repository_names)
+
+        # comment out for now
+        # output.external_subfolder_migration.migrate(repositories)
+
 
 class RepositoryTree:
     recursive_list = Optional[RecursiveList]
@@ -107,6 +134,8 @@ class RepositoryTree:
     def __init__(self, top):
         self.top = top
         self.remote_paths = []
+        self.repositories = []
+        self.repository_names = []
 
     def parse_recursively(self):
         self.recursive_list = RecursiveList(self.top, (None, None))
@@ -119,9 +148,29 @@ class RepositoryTree:
         self.recursive_list.get_remote_paths(self.remote_paths)
         return self.remote_paths
 
+    def get_list_of_repository_names_recursively(self):
+        if not self.remote_paths:
+            self.recursive_list.get_remote_paths(self.remote_paths)
+
+        self.repository_names = []
+        for remote_path in self.remote_paths:
+            repository_name = parser.branchConfigurationParser.parse_repo_name(
+                remote_path
+            )
+            self.repository_names.append(repository_name)
+
+        return self.repository_names
+
+    def get_list_of_repositories_recursively(self):
+        self.recursive_list.get_repositories(self.repositories)
+        return self.repositories
+
     def checkout_git_repositories_recursively(self):
         if not self.remote_paths:
             self.get_list_of_remote_paths_recursively()
+
+        if not self.repositories:
+            self.get_list_of_repositories_recursively()
 
         self.recursive_list.checkout_git_repositories(self.remote_paths)
 
@@ -129,4 +178,21 @@ class RepositoryTree:
         if not self.remote_paths:
             self.get_list_of_remote_paths_recursively()
 
-        self.recursive_list.migrate_repositories(self.remote_paths)
+        if not self.repositories:
+            self.get_list_of_repositories_recursively()
+
+        self.recursive_list.migrate_repositories(self.remote_paths, self.repositories)
+
+    def upload_repositories_recursively(self):
+        if not self.remote_paths:
+            self.get_list_of_remote_paths_recursively()
+
+        if not self.repository_names:
+            self.get_list_of_repository_names_recursively()
+
+        if not self.repositories:
+            self.get_list_of_repositories_recursively()
+
+        self.recursive_list.upload_repositories(
+            self.repository_names, self.repositories
+        )

@@ -35,4 +35,5 @@ furrere = Furrer E <furrere@email.com>
 grossenbacherf = Grossenbacher Fabian <fabian.grossenbacher@curtis.ch>
 burrib = Burri Benno <benno.burri@curtis.ch>
 kurzent = Kurzen Thomas <thomas.kurzen@curtis.ch>
+bieria = Bieri Andreas <andreas.bieri@curtis.ch>
 (no author) = gitsvn <gitsvn@gitsvn.com>

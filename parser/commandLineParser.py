@@ -1,4 +1,3 @@
-import os
 import argparse
 import data.configuration as configuration
 
@@ -41,13 +40,23 @@ def parse():
         help="Print collected data of externals.",
     )
     parser.add_argument(
+        "--upload-econ-folder",
+        action="store_true",
+        help="Print collected data of externals.",
+    )
+    parser.add_argument(
         "--print", action="store_true", help="Print collected data of externals."
     )
     parser.add_argument("--local-path", help="Specify path to local git repository.")
     parser.add_argument(
         "--migration-output-path",
         default="C:\\localSharedPool",
-        help="Specify path migration output.",
+        help="Specify path for migration output.",
+    )
+    parser.add_argument(
+        "--transformation-output-path",
+        default="C:\\bitbucketWorkspace\\gitNoExternals",
+        help="Specify path for transformation output.",
     )
     parser.add_argument(
         "--base-server-url",
@@ -61,9 +70,24 @@ def parse():
     parser.add_argument(
         "--branch-path", help="Specify path to a branch.", default="trunk"
     )
+    parser.add_argument(
+        "--fetch-and-publish-all",
+        help="Fetch and publish all repositories.",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--reset-migration-output-path",
+        help="Reset migration output path.",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--upload-no-externals",
+        help="Upload repositories without externals.",
+        action="store_true",
+    )
     args = parser.parse_args()
 
-    if not (args.publish or args.migrate_econ_folder):
+    if not (args.publish or args.migrate_econ_folder or args.upload_econ_folder):
         if args.remote_url is None:
             parser.error("--remote-url missing")
 

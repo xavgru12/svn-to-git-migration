@@ -14,7 +14,7 @@ def parse():
 def parse_repo_name(remote_path):
     name = remote_path.split("/")[-1]
     if name == "HC-Q":
-        return "ag-nor-image-creator"
+        return "ag-hcq"
     elif name == "CuRMiT":
         return "ag-curmit"
     elif name == "eX1":
@@ -51,60 +51,115 @@ def replace_capitals_with_lower_case_dash(name):
     return final_name
 
 
-def debug():
-    generic = dict()
-    generic["trunk"] = {"folders": ["trunk", "Trunk", "current", "ProtoGen", "Plugin"]}
-    generic["branches"] = {
-        "folders": ["branches", "Branch", "Branches"],
-        "subfolders": [
-            "AMU",
-            "AMU1",
-            "FNE",
-            "LBR",
-            "MVE",
-            "feature",
-            "work",
-            "release",
-            "evaluation",
-            "patches",
-        ],
-    }
-    generic["tags"] = {
-        "folders": ["tags", "distribution", "distr"],
-        "subfolders": ["review", "release"],
-    }
+def get_top_and_sub_folders_from_configuration(branch_types):
+    branch_configuration = parse()
 
-    specific = dict()
-    specific["OS"] = {
-        "branches": [
-            "Projects/enAbleX1/SW/SharedComponents/CMSIS/Device/ST/STM32F7xx/{branches}"
-        ]
-    }
-    specific["X1FlashCreator"] = {
-        "tags": ["Projects/enAbleX1/SW/Tools/X1FlashCreator/{distr}"]
-    }
-    specific["edes"] = {"tags": ["Projects/enAbleX1/SW/Tools/Edes/{tags}"]}
+    generic_configuration = branch_configuration["generic"]
 
-    dictionary = dict()
-    dictionary["generic"] = generic
-    dictionary["specific"] = specific
+    top_folders = get_all_folder_names_by_type(
+        generic_configuration, "folders", branch_types
+    )
+    sub_folders = get_all_folder_names_by_type(
+        generic_configuration, "subfolders", branch_types
+    )
 
-    generic = dict()
-
-    with open("data/branchConfiguration.json", "w+") as f:
-        json.dump(dictionary, f, indent=4)
-
-    # data= parse()
-
-    test = dictionary["generic"]["branches"]["subfolders"]
-    test = dictionary["generic"]["trunk"]
-    print("print keys: ")
-    for trunk_keys in test.keys():
-        output = dictionary["generic"]["trunk"].get(trunk_keys)
-        print(
-            f'key: {trunk_keys}, dictionary["generic"]["trunk"].get(trunk_keys): {output}'
-        )
+    return top_folders, sub_folders
 
 
-if __name__ == "__main__":
-    debug()
+def get_all_variations_as_list():
+    branch_types = ["trunk", "branches", "tags"]
+    top_folders, sub_folders = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return get_all_variations(top_folders, sub_folders)
+
+
+def get_all_branch_name_variations_as_list():
+    branch_types = ["branches"]
+    top_folders, sub_folders = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return get_all_variations(top_folders, sub_folders)
+
+
+def get_all_tag_top_folders_as_list():
+    branch_types = ["tags"]
+    top_folders, _ = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return top_folders
+
+
+def get_all_tag_sub_folders_as_list():
+    branch_types = ["tags"]
+    _, sub_folders = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return sub_folders
+
+
+def get_all_branch_top_folders_as_list():
+    branch_types = ["branches"]
+    top_folders, _ = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return top_folders
+
+
+def get_all_trunk_variations_as_list():
+    branch_types = ["trunk"]
+    top_folders, sub_folders = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return get_all_variations(top_folders, sub_folders)
+
+
+def get_all_tag_name_variations_as_list():
+    branch_types = ["tags"]
+    top_folders, sub_folders = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return get_all_variations(top_folders, sub_folders)
+
+
+def get_all_folders_with_subfolders_variations_as_list():
+    branch_types = ["trunk", "branches", "tags"]
+    top_folders, sub_folders = get_top_and_sub_folders_from_configuration(branch_types)
+
+    return get_all_folders_with_subfolders(top_folders, sub_folders)
+
+
+def get_all_folder_names_by_type(generic_configuration, folder_type, branch_types):
+    folders = []
+
+    for branch_type in generic_configuration.keys():
+        if branch_type in branch_types:
+            folder = generic_configuration[branch_type].get(folder_type)
+            if folder is not None:
+                folders.extend(folder)
+
+    return folders
+
+
+def get_all_branch_folder_names(generic_configuration, folder_type):
+    branch_types = ["trunk", "branches"]
+    folders = []
+
+    for branch_type in generic_configuration.keys():
+        if branch_type in branch_types:
+            folder = generic_configuration[branch_type].get(folder_type)
+            if folder is not None:
+                folders.extend(folder)
+
+    return folders
+
+
+def get_all_folders_with_subfolders(top_folders, sub_folders):
+    variations = []
+    for top_folder in top_folders:
+        for sub_folder in sub_folders:
+            variation = f"{top_folder}/{sub_folder}"
+            variations.append(variation)
+
+    return variations
+
+
+def get_all_variations(top_folders, sub_folders):
+    variations = get_all_folders_with_subfolders(top_folders, sub_folders)
+
+    variations.extend(top_folders)
+
+    return variations

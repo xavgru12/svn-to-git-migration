@@ -14,6 +14,7 @@ def write(args):
     configuration["migration_output_path"] = args.migration_output_path
     configuration["publish_output_path"] = args.publish_output_path
     configuration["migrate_econ_folder"] = args.migrate_econ_folder
+    configuration["transformation_output_path"] = args.transformation_output_path
 
     file = "cache/configuration.json"
     os.makedirs(os.path.dirname(file), exist_ok=True)
@@ -57,3 +58,8 @@ def get_migration_output_path():
 def get_publish_output_path():
     data = load()
     return data["publish_output_path"]
+
+
+def get_transformation_output_path():
+    data = load()
+    return data["transformation_output_path"]

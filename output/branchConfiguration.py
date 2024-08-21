@@ -7,6 +7,8 @@ import model.branchModel
 def add(data_object):
     branch_configuration = parser.branchConfigurationParser.parse()
 
+    repositories_without_branch = branch_configuration["repositoriesWithoutBranches"]
+
     generic_configuration = branch_configuration["generic"]
 
     for branch_type in generic_configuration.keys():
@@ -15,10 +17,13 @@ def add(data_object):
             branch_type,
             generic_configuration[branch_type]["folders"],
             generic_configuration[branch_type].get("subfolders"),
+            repositories_without_branch,
         )
 
 
-def generate_branches(data_object, branch_type, folders, subfolders):
+def generate_branches(
+    data_object, branch_type, folders, subfolders, repositories_without_branch
+):
     existing_branches = []
 
     if folders is None:
@@ -26,7 +31,9 @@ def generate_branches(data_object, branch_type, folders, subfolders):
             f"folders does not exist in branchConfiguration.json for branch type: {branch_type}"
         )
 
-    existing_folders = add_folders(folders, branch_type, data_object.remote_path)
+    existing_folders = add_folders(
+        folders, branch_type, data_object.remote_path, repositories_without_branch
+    )
     existing_branches.extend(existing_folders)
 
     if subfolders is not None:
@@ -39,8 +46,20 @@ def generate_branches(data_object, branch_type, folders, subfolders):
     data_object.branches.extend(existing_branches)
 
 
-def add_folders(folders, branch_type, remote_path):
+def add_folders(folders, branch_type, remote_path, repositories_without_branch):
     branch_list = []
+    if branch_type == "trunk":
+        for branch in repositories_without_branch:
+            if remote_path == branch:
+                branch_url = f"{configuration.get_base_server_url()}/{branch}"
+                if check_for_existence(branch_url) is True:
+                    remote_part = f"refs/remotes/origin/trunk"
+
+                    branch_line_string = build_branch_string(
+                        "trunk", branch, remote_part
+                    )
+                    branch_list.append(branch_line_string)
+                    return branch_list
 
     for folder in folders:
         if folder == "Uid" and "LogicalComponents (obsolete)/Uid" in remote_path:

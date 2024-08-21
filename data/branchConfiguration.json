@@ -4,12 +4,7 @@
             "folders": [
                 "trunk",
                 "Trunk",
-                "current",
-                "ProtoGen",
-                "Plugin",
-                "ThirdParty",
-                "SimpleTimerPortable",
-                "Uid"
+                "current"
             ]
         },
         "branches": {
@@ -60,5 +55,7 @@
                 "Projects/enAbleX1/SW/Tools/Edes/{tags}"
             ]
         }
-    }
+    },
+    "repositoriesWithoutBranches": ["Projects/ECON/SW/protobuf-net", "Projects/ECON/SW/Plugin", "Projects/ECON/SW/Common/SimpleTimerPortable", "Uid", "Projects/ECON/SW/Common/ThirdParty"]
+    
 }

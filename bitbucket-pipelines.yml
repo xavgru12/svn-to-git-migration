@@ -2,16 +2,40 @@ image: python:3.12
 
 pipelines:
   default:
-    - parallel:
+    - step:
+        name: Lint and format
+        script:
+          - pip install ruff
+          - ruff format --diff  
+          - ruff check . --select N
+  custom:
+    econ-upload:
       - step:
-          name: Install packages from requirements.txt
-          caches:
-            - pip
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Migrate Econ Folder"
           script:
-            - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+            - python svnExternals.py --migrate-econ-folder --local-path C:\econwTest
       - step:
-          name: Lint and format
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Upload Econ Folder"
           script:
-            - pip install ruff
-            - ruff format --diff  
-            - ruff check . --select N
+            - python svnExternals.py --upload-econ-folder --local-path C:\econwTest
+    enablex1-upload:
+      - step:
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Migrate enableX1"
+          script:
+            - python svnExternals.py --remote-url http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1 --migrate
+      - step:
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Upload enableX1"
+          script:
+            - python svnExternals.py --remote-url http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1 --upload-no-externals
