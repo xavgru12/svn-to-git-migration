@@ -24,6 +24,7 @@ def execute(arguments):
         or arguments.checkout_git
         or arguments.migrate
         or arguments.upload_no_externals
+        or arguments.upload_no_externals_subfolders
     ):
         remote_path = configuration.get_remote_url().replace(
             f"{configuration.get_base_server_url()}/", ""
@@ -69,6 +70,9 @@ def execute(arguments):
     if arguments.upload_no_externals:
         tree.upload_repositories_recursively()
 
+    if arguments.upload_no_externals_subfolders:
+        tree.upload_subfolder_repositories_recursively()
+
     if arguments.publish:
         output.publish.publish()
 
@@ -77,3 +81,6 @@ def execute(arguments):
 
     if arguments.upload_econ_folder:
         migration.upload_econ_folder()
+
+    if arguments.upload_econ_folder_subfolders:
+        migration.upload_econ_folder_subfolders()

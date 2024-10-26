@@ -3,7 +3,7 @@ import parser.branchConfigurationParser
 import data.configuration as configuration
 import shutil
 import output.external_checker
-import output.shutil_execute
+import execution.shutil_execution
 
 
 def checkout(repository):
@@ -38,7 +38,7 @@ def checkout(repository):
     if not os.path.isfile(zip_file_destination_path):
         raise FileNotFoundError(zip_file_destination_path)
 
-    output.shutil_execute.extract(zip_file_destination_path, destination_directory)
+    execution.shutil_execution.extract(zip_file_destination_path, destination_directory)
 
     # prefer commit, if commit is not available take branch
     if repository.commit_revision:

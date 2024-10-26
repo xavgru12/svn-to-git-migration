@@ -9,7 +9,7 @@ import output.gitCheckout
 import output.migration
 import output.logger
 
-# import output.external_subfolder_migration
+import output.external_subfolder_migration
 import parser.branchConfigurationParser
 import output.transformation
 
@@ -36,11 +36,14 @@ class RecursiveList:
         else:
             branch_name = ""
 
-        branch_dict = parser.svnRepositoryParser.parse(
-            f"{configuration.get_base_server_url()}/{self.current.remote_path}{branch_name}",
-            current_folder_path,
-            self.current.commit_revision,
-        )
+        if "cmake-os" in branch_name:
+            branch_dict = {}
+        else:
+            branch_dict = parser.svnRepositoryParser.parse(
+                f"{configuration.get_base_server_url()}/{self.current.remote_path}{branch_name}",
+                current_folder_path,
+                self.current.commit_revision,
+            )
         self.dependencies = []
         for dependency in branch_dict.values():
             self.dependencies.append(RecursiveList(dependency, (None, None)))
@@ -121,11 +124,11 @@ class RecursiveList:
 
         output.migration.migrate_svn_externals_to_git(remote_paths, logger)
 
-    def upload_repositories(self, repository_names, repositories):
+    def upload_repositories(self, repository_names):
         output.transformation.upload(repository_names)
 
-        # comment out for now
-        # output.external_subfolder_migration.migrate(repositories)
+    def upload_subfolder_repositories(self, repositories):
+        output.external_subfolder_migration.migrate(repositories)
 
 
 class RepositoryTree:
@@ -185,15 +188,13 @@ class RepositoryTree:
         self.recursive_list.migrate_repositories(self.remote_paths, self.repositories)
 
     def upload_repositories_recursively(self):
-        if not self.remote_paths:
-            self.get_list_of_remote_paths_recursively()
-
         if not self.repository_names:
             self.get_list_of_repository_names_recursively()
 
+        self.recursive_list.upload_repositories(self.repository_names)
+
+    def upload_subfolder_repositories_recursively(self):
         if not self.repositories:
             self.get_list_of_repositories_recursively()
 
-        self.recursive_list.upload_repositories(
-            self.repository_names, self.repositories
-        )
+        self.recursive_list.upload_subfolder_repositories(self.repositories)

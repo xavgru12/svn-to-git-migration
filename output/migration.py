@@ -7,10 +7,10 @@ import sys
 import output.branchConfiguration
 import datetime
 import output.printRepositoryData
-import output.subprocess_execution
+import execution.subprocess_execution
 import parser.branchConfigurationParser
 import model.svnRepositoryModel
-import output.shutil_execute
+import execution.shutil_execution
 import output.transformation
 
 
@@ -53,7 +53,26 @@ def migrate_econ_folder():
     #     tree.checkout_git_repositories_recursively()
 
 
-def upload_econ_folder():
+def retrieve_repository_names_for_upload(trees):
+    repository_names = []
+    for tree in trees:
+        list_of_names = tree.get_list_of_repository_names_recursively()
+        repository_names.extend(list_of_names)
+
+    removed_duplicate_repositories = list(set(repository_names))
+    return removed_duplicate_repositories
+
+
+def retrieve_repositories_for_subfoler_upload(trees):
+    repositories = []
+    for tree in trees:
+        list_of_repositories = tree.get_list_of_repositories_recursively()
+        repositories.extend(list_of_repositories)
+
+    return repositories
+
+
+def retrieve_trees():
     repository_paths = get_econ_repository_paths()
     print("econ folder repository paths:")
     print(repository_paths)
@@ -65,18 +84,19 @@ def upload_econ_folder():
         print(f"tree: {tree.recursive_list.current.folder_name}")
         tree.print_tree()
 
-    repository_names = []
-    for tree in trees:
-        list_of_names = tree.get_list_of_repository_names_recursively()
-        repository_names.extend(list_of_names)
+    return trees
 
-    removed_duplicate_repositories = list(set(repository_names))
-    output.transformation.upload(removed_duplicate_repositories)
 
-    # comment external subfolder migration for now
-    # for tree in trees:
-    #     repositories = tree.get_list_of_repositories_recursively()
-    #     output.external_subfolder_migration.migrate(repositories)
+def upload_econ_folder():
+    trees = retrieve_trees()
+    repository_names = retrieve_repository_names_for_upload(trees)
+    output.transformation.upload(repository_names)
+
+
+def upload_econ_folder_subfolders():
+    trees = retrieve_trees()
+    repositories = retrieve_repositories_for_subfoler_upload(trees)
+    output.external_subfolder_migration.migrate(repositories)
 
 
 def create_econ_repository_trees(repository_paths):
@@ -283,7 +303,7 @@ def execute_with_log(command, repo_name, local_repo_path):
             + "-" * 70
             + "\n"
         )
-        for log in output.subprocess_execution.continuous_execute(
+        for log in execution.subprocess_execution.continuous_execute(
             command, local_repo_path, "stderr"
         ):
             print(f"{repo_name}: {append_log}: {log}")
@@ -294,7 +314,7 @@ def execute_with_log(command, repo_name, local_repo_path):
 def reset_migration_output_path():
     migration_output_path = configuration.get_migration_output_path()
     print(f"delete migration output path: {migration_output_path}")
-    output.shutil_execute.delete(migration_output_path)
+    execution.shutil_execution.delete(migration_output_path)
 
     publish_output_path = configuration.get_publish_output_path()
     latest_publish_path = os.path.join(publish_output_path, "latest")
@@ -330,4 +350,4 @@ def unzip(directory):
             repository_folder = repository.replace(".zip", "")
             new_repository_path = os.path.join(directory, repository_folder)
             zip_file_path = os.path.join(directory, repository)
-            output.shutil_execute.extract(zip_file_path, new_repository_path)
+            execution.shutil_execution.extract(zip_file_path, new_repository_path)

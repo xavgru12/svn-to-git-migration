@@ -37,12 +37,17 @@ def parse():
     parser.add_argument(
         "--migrate-econ-folder",
         action="store_true",
-        help="Print collected data of externals.",
+        help="Migrate econ folder.",
     )
     parser.add_argument(
         "--upload-econ-folder",
         action="store_true",
-        help="Print collected data of externals.",
+        help="Upload econ folder.",
+    )
+    parser.add_argument(
+        "--upload-econ-folder-subfolders",
+        action="store_true",
+        help="Upload subfolders of econ folder repositories.",
     )
     parser.add_argument(
         "--print", action="store_true", help="Print collected data of externals."
@@ -85,9 +90,19 @@ def parse():
         help="Upload repositories without externals.",
         action="store_true",
     )
+    parser.add_argument(
+        "--upload-no-externals-subfolders",
+        help="Upload subfolder repositories without externals.",
+        action="store_true",
+    )
     args = parser.parse_args()
 
-    if not (args.publish or args.migrate_econ_folder or args.upload_econ_folder):
+    if not (
+        args.publish
+        or args.migrate_econ_folder
+        or args.upload_econ_folder
+        or args.upload_econ_folder_subfolders
+    ):
         if args.remote_url is None:
             parser.error("--remote-url missing")
 

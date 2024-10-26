@@ -33,6 +33,13 @@ def parse_repo_name(remote_path):
     return ag_repo_name
 
 
+def parse_subfolder_repo_name(repository_name, subfolder):
+    branch_name = subfolder.replace("/", "-")
+    destination_name = f"{repository_name}_{branch_name}_subfolder"
+    destination_name = destination_name[:62]
+    return destination_name
+
+
 def replace_capitals_with_lower_case_dash(name):
     final_name = ""
     sequence = False

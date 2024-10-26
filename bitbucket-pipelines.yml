@@ -24,6 +24,13 @@ pipelines:
           name: "Upload Econ Folder"
           script:
             - python svnExternals.py --upload-econ-folder --local-path C:\econwTest
+      - step:
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Upload Econ subfolders"
+          script:
+            - python svnExternals.py --upload-econ-folder-subfolders --local-path C:\econwTest
     enablex1-upload:
       - step:
           runs-on:
@@ -39,3 +46,10 @@ pipelines:
           name: "Upload enableX1"
           script:
             - python svnExternals.py --remote-url http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1 --upload-no-externals
+      - step:
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Upload enableX1 subfolders"
+          script:
+            - python svnExternals.py --remote-url http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1 --upload-no-externals-subfolders
