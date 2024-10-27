@@ -1,0 +1,43 @@
+python svnExternals.py --fetch-and-publish-all --remote-url "http://ag-reposerver/repo/Projects/ECON/SW/MobileApp"
+
+python svnExternals.py --migration-output-path C:\code\anotherTest19 --reset-migration-output-path
+
+python svnExternals.py --reset-migration-output-path --remote-url "http://ag-reposerver/repo/Projects/ECON/SW/MobileApp"
+
+python svnExternals.py --upload-no-externals --remote-url "http://ag-reposerver/repo/Projects/ECON/SW/MobileApp"
+
+
+python svnExternals.py --migrate --remote-url "http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1"
+
+python svnExternals.py --upload-no-externals --remote-url "http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1"
+
+python svnExternals.py --upload-no-externals-subfolders --remote-url "http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1"
+
+
+
+python svnExternals.py --migrate-econ-folder --local-path C:\econwTest
+
+python svnExternals.py --upload-econ-folder --local-path C:\econwTest  
+
+python svnExternals.py --upload-econ-folder-subfolders --local-path C:\econwTest 
+
+
+http://ag-reposerver/repo/
+
+python svnExternals.py --local-path C:\econwTest  --remote-url "http://ag-reposerver/repo/Projects/ECON/SW/Core" --upload-no-externals
+
+
+python svnExternals.py --local-path C:\econwTest  --remote-url "http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1" --upload-no-externals
+
+run ag-ats-fx20 in branch_name_conversion
+
+
+http://ag-reposerver/repo/Projects/enAbleX1/SW/ATS/TestSoftwareF4xx
+
+python svnExternals.py --migrate --remote-url "http://ag-reposerver/repo/Projects/enAbleX1/SW/ATS/TestSoftwareF4xx"
+
+api for subfolder upload and normal upload
+create function for remote subfolder repo name
+
+log to file subfolder migration
+make funtions in subfolder upload smaller

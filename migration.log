@@ -1,0 +1,486 @@
+--------------------------------------------------------------------------------------------
+folderName: ag-system-firmware
+baseFolder: 
+localFolderPath: None
+remotePath: Projects/enAbleX1/SW/eX1
+branchName: trunk
+commitRevision: 
+--------------------------------------------------------------------------------------------
+http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1/trunk/Lib - ^/Projects/enAbleX1/SW/SharedComponents/emWin/tags/v5.22_F427_E@285541 emWin
+^/Projects/enAbleX1/SW/SharedComponents/Types/tags/release/v01.000.001@531773 Types
+^/Projects/enAbleX1/SW/SharedComponents/Definitions/tags/release/v01.038.000/Definitions@537872 Definitions
+^/Projects/enAbleX1/SW/SharedComponents/Framework/BuildingBlock/tags/release/v01.029.000/BuildingBlockFramework@541580 BuildingBlockFramework
+^/Projects/enAbleX1/SW/SharedComponents/Utilities/tags/release/v01.079.001/Utilities@543073 Utilities
+^/Projects/enAbleX1/SW/SharedComponents/PartitionManager/tags/release/v02.000.000/PartitionManager@487368 PartitionManager
+^/Projects/enAbleX1/SW/SharedComponents/Drivers/STM32F7xx_HAL_Driver/tags/release/1.2.9_1/STM32F7xx_HAL_Driver@422355 STM32F7xx_HAL
+^/Projects/enAbleX1/SW/SharedComponents/EmbeddedDatabase/tags/release/v01.010.003/EmbeddedDatabase@544156 EmbeddedDatabase
+^/Projects/enAbleX1/SW/SharedComponents/CortexM4Functions/tags/release/v01.012.000/CortexM4Functions@423503 CortexM4Functions
+^/Projects/enAbleX1/SW/SharedComponents/CortexM7Functions/tags/release/v01.003.000/CortexM7Functions@423825 CortexM7Functions
+^/Projects/enAbleX1/SW/SharedComponents/StateMachineFramework/tags/release/v03.019.000/StateMachineFramework@538019 StateMachineFramework
+^/Projects/enAbleX1/SW/SharedComponents/StollmannBtStack/tags/V1.006.005@477785 BtStack
+^/Projects/enAbleX1/SW/SharedComponents/emFile/tags/release/v01.004.002/emFile/FS@140430 emFile
+^/Projects/enAbleX1/SW/SharedComponents/emFile/tags/release/v01.006.002/emFile/FS@372510 emFile_v01.006.002
+^/Projects/enAbleX1/SW/SharedComponents/emFile/tags/release/v01.004.004b/emFile/FS@497365 emFile_NAND
+^/Projects/enAbleX1/SW/SharedComponents/Images/tags/release/v01.097.000/Images@546949 Images
+^/Projects/enAbleX1/SW/SharedComponents/MemoryMapping/tags/release/v01.013.000/MemoryMapping@546929 MemoryMapping
+^/Projects/enAbleX1/SW/SharedComponents/CANopen_library/tags/release/v01.024.000/source@461770 CANopen
+^/Projects/enAbleX1/SW/SharedComponents/EepromFileSystem/tags/release/v01.003.006/EepromFileSystem@439778 EepromFileSystem
+^/Projects/enAbleX1/SW/SharedComponents/OS/distribution/v01.025.011/CMSIS-RTOS@431127 CMSIS-RTOS
+^/Projects/enAbleX1/SW/SharedComponents/CMSIS/Device/ST/STM32F7xx/tags/1.2.6/src@414577 CMSIS_device
+^/Projects/enAbleX1/SW/SharedComponents/OS/distribution/v01.025.011/OS@431127 OS
+^/Projects/enAbleX1/SW/SharedComponents/Branding/tags/release/v01.006.000/Branding@436198 Branding
+^/Projects/enAbleX1/SW/System/SupervisionMicro/Common/SupervisorProtocol/tags/release/v00.007.000/SupervisorProtocol@517071 SvMicroServices
+^/Projects/enAbleX1/SW/SharedComponents/UsbDeviceLib/tags/release/2.6.0_1/UsbDeviceLib@414511 STM32_USB_CDC_Device
+^/Curtis_AG/Enterprise/SW/ThirdParty/Embedded_Template_Library/tags/v20.38.6/etl/include/etl@499632 etl
+
+http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1/trunk/Lib/STM32F4xx_StdPeriph_Lib - ^/Projects/enAbleX1/SW/SharedComponents/Drivers/STM32F4xx_StdPeriph_Lib/tags/release/v01.004.001/inc@497491 inc
+^/Projects/enAbleX1/SW/SharedComponents/Drivers/STM32F4xx_StdPeriph_Lib/tags/release/v01.004.001/src@497570 src
+
+http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1/trunk/Lib/STM32L4xx_HAL_Driver - ^/Projects/enAbleX1/SW/SharedComponents/Drivers/STM32L4xx_HAL_Driver/tags/v1.11.1/Inc@497495 inc
+^/Projects/enAbleX1/SW/SharedComponents/Drivers/STM32L4xx_HAL_Driver/tags/v1.11.1/Src@497495 src
+
+http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1/trunk/Lib/nanoPb - ^/Curtis_AG/Enterprise/SW/ThirdParty/nanoPB/tags/v0.3.1/lib@66747 lib
+^/Curtis_AG/Enterprise/SW/ThirdParty/nanoPB/tags/v0.3.1/win32@66747 win32
+^/Curtis_AG/Enterprise/SW/ThirdParty/nanoPB/tags/v0.3.1/stm32fxxx@66747 stm32fxxx
+
+http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1/trunk/Projects/Test - ^/Projects/enAbleX1/SW/SharedComponents/OS/branches/work/cmake-os@541925 cmake-os
+
+http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1/trunk/Tools - ^/Projects/enAbleX1/SW/HC-Q/trunk/Tools/NORImageCreator@323940 NORImageCreator
+^/Projects/enAbleX1/SW/Tools/X1FlashBuilder/distr/release/v01.002.000@15838 X1FlashBuilder
+^/Projects/enAbleX1/SW/Tools/X1FlashCreator/distr@508604 X1FlashCreator
+^/Curtis_AG/Enterprise/SW/CuRMiT/distr@509241 CuRMiT
+^/Curtis_AG/Enterprise/SW/Tools/pbGenerator/tags/v1.0.2/release@76837 pbGeneratorV1.0.2
+^/Curtis_AG/Enterprise/SW/Tools/pbGenerator/tags/v1.0.3/release@373671 pbGeneratorV1.0.3
+^/Projects/ECON/SW/protobuf-net/ProtoGen@199130 ProtoGen
+^/Projects/enAbleX1/SW/Tools/PngToCppConverter/trunk/distr@497978 PngToCppConverter
+^/Projects/enAbleX1/SW/Tools/Edes/trunk/bin/Release@542389 Edes
+
+
+--------------------------------------------------------------------------------------------
+folderName: emWin
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/emWin
+branchName: tags/v5.22_F427_E
+commitRevision: 285541
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: Types
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Types
+branchName: tags/release/v01.000.001
+commitRevision: 531773
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: Definitions
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Definitions
+branchName: tags/release/v01.038.000/Definitions
+commitRevision: 537872
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: BuildingBlockFramework
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Framework/BuildingBlock
+branchName: tags/release/v01.029.000/BuildingBlockFramework
+commitRevision: 541580
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: Utilities
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Utilities
+branchName: tags/release/v01.079.001/Utilities
+commitRevision: 543073
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: PartitionManager
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/PartitionManager
+branchName: tags/release/v02.000.000/PartitionManager
+commitRevision: 487368
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: STM32F7xx_HAL
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Drivers/STM32F7xx_HAL_Driver
+branchName: tags/release/1.2.9_1/STM32F7xx_HAL_Driver
+commitRevision: 422355
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: EmbeddedDatabase
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/EmbeddedDatabase
+branchName: tags/release/v01.010.003/EmbeddedDatabase
+commitRevision: 544156
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: CortexM4Functions
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/CortexM4Functions
+branchName: tags/release/v01.012.000/CortexM4Functions
+commitRevision: 423503
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: CortexM7Functions
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/CortexM7Functions
+branchName: tags/release/v01.003.000/CortexM7Functions
+commitRevision: 423825
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: StateMachineFramework
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/StateMachineFramework
+branchName: tags/release/v03.019.000/StateMachineFramework
+commitRevision: 538019
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: BtStack
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/StollmannBtStack
+branchName: tags/V1.006.005
+commitRevision: 477785
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: emFile
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/emFile
+branchName: tags/release/v01.004.002/emFile/FS
+commitRevision: 140430
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: emFile_v01.006.002
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/emFile
+branchName: tags/release/v01.006.002/emFile/FS
+commitRevision: 372510
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: emFile_NAND
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/emFile
+branchName: tags/release/v01.004.004b/emFile/FS
+commitRevision: 497365
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: Images
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Images
+branchName: tags/release/v01.097.000/Images
+commitRevision: 546949
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: MemoryMapping
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/MemoryMapping
+branchName: tags/release/v01.013.000/MemoryMapping
+commitRevision: 546929
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: CANopen
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/CANopen_library
+branchName: tags/release/v01.024.000/source
+commitRevision: 461770
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: EepromFileSystem
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/EepromFileSystem
+branchName: tags/release/v01.003.006/EepromFileSystem
+commitRevision: 439778
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: CMSIS-RTOS
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/OS
+branchName: distribution/v01.025.011/CMSIS-RTOS
+commitRevision: 431127
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: CMSIS_device
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/CMSIS/Device/ST/STM32F7xx
+branchName: tags/1.2.6/src
+commitRevision: 414577
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: OS
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/OS
+branchName: distribution/v01.025.011/OS
+commitRevision: 431127
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: Branding
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Branding
+branchName: tags/release/v01.006.000/Branding
+commitRevision: 436198
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: SvMicroServices
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/System/SupervisionMicro/Common/SupervisorProtocol
+branchName: tags/release/v00.007.000/SupervisorProtocol
+commitRevision: 517071
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: STM32_USB_CDC_Device
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/UsbDeviceLib
+branchName: tags/release/2.6.0_1/UsbDeviceLib
+commitRevision: 414511
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: etl
+baseFolder: /Lib
+localFolderPath: 
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/Embedded_Template_Library
+branchName: tags/v20.38.6/etl/include/etl
+commitRevision: 499632
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: inc
+baseFolder: /Lib/STM32F4xx_StdPeriph_Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Drivers/STM32F4xx_StdPeriph_Lib
+branchName: tags/release/v01.004.001/inc
+commitRevision: 497491
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: src
+baseFolder: /Lib/STM32F4xx_StdPeriph_Lib
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Drivers/STM32F4xx_StdPeriph_Lib
+branchName: tags/release/v01.004.001/src
+commitRevision: 497570
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: inc
+baseFolder: /Lib/STM32L4xx_HAL_Driver
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Drivers/STM32L4xx_HAL_Driver
+branchName: tags/v1.11.1/Inc
+commitRevision: 497495
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: src
+baseFolder: /Lib/STM32L4xx_HAL_Driver
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/Drivers/STM32L4xx_HAL_Driver
+branchName: tags/v1.11.1/Src
+commitRevision: 497495
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: lib
+baseFolder: /Lib/nanoPb
+localFolderPath: 
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/nanoPB
+branchName: tags/v0.3.1/lib
+commitRevision: 66747
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: win32
+baseFolder: /Lib/nanoPb
+localFolderPath: 
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/nanoPB
+branchName: tags/v0.3.1/win32
+commitRevision: 66747
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: stm32fxxx
+baseFolder: /Lib/nanoPb
+localFolderPath: 
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/nanoPB
+branchName: tags/v0.3.1/stm32fxxx
+commitRevision: 66747
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: cmake-os
+baseFolder: /Projects/Test
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/SharedComponents/OS
+branchName: branches/work/cmake-os
+commitRevision: 541925
+--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
+folderName: NORImageCreator
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/HC-Q
+branchName: trunk/Tools/NORImageCreator
+commitRevision: 323940
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: X1FlashBuilder
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/Tools/X1FlashBuilder
+branchName: distr/release/v01.002.000
+commitRevision: 15838
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: X1FlashCreator
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/Tools/X1FlashCreator
+branchName: distr
+commitRevision: 508604
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: CuRMiT
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Curtis_AG/Enterprise/SW/CuRMiT
+branchName: distr
+commitRevision: 509241
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: pbGeneratorV1.0.2
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Curtis_AG/Enterprise/SW/Tools/pbGenerator
+branchName: tags/v1.0.2/release
+commitRevision: 76837
+--------------------------------------------------------------------------------------------
+http://ag-reposerver/repo/Curtis_AG/Enterprise/SW/Tools/pbGenerator/tags/v1.0.2/release - ^/Curtis_AG/Enterprise/SW/ThirdParty/nanoPB/tags/v0.3.1/generator-bin@66747 generator-bin
+^/Curtis_AG/Enterprise/SW/ThirdParty/nanoPB/tags/v0.3.1/generator@66747 generator
+
+
+--------------------------------------------------------------------------------------------
+folderName: generator-bin
+baseFolder: 
+localFolderPath: None/Tools/pbGeneratorV1.0.2
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/nanoPB
+branchName: tags/v0.3.1/generator-bin
+commitRevision: 66747
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: generator
+baseFolder: 
+localFolderPath: None/Tools/pbGeneratorV1.0.2
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/nanoPB
+branchName: tags/v0.3.1/generator
+commitRevision: 66747
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: pbGeneratorV1.0.3
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Curtis_AG/Enterprise/SW/Tools/pbGenerator
+branchName: tags/v1.0.3/release
+commitRevision: 373671
+--------------------------------------------------------------------------------------------
+http://ag-reposerver/repo/Curtis_AG/Enterprise/SW/Tools/pbGenerator/tags/v1.0.3/release - ^/Curtis_AG/Enterprise/SW/ThirdParty/nanoPB/tags/v0.3.9.6/generator-bin@354080 generator-bin
+^/Curtis_AG/Enterprise/SW/ThirdParty/nanoPB/tags/v0.3.9.6/generator@354080 generator
+
+
+--------------------------------------------------------------------------------------------
+folderName: generator-bin
+baseFolder: 
+localFolderPath: None/Tools/pbGeneratorV1.0.3
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/nanoPB
+branchName: tags/v0.3.9.6/generator-bin
+commitRevision: 354080
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: generator
+baseFolder: 
+localFolderPath: None/Tools/pbGeneratorV1.0.3
+remotePath: Curtis_AG/Enterprise/SW/ThirdParty/nanoPB
+branchName: tags/v0.3.9.6/generator
+commitRevision: 354080
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: ProtoGen
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Projects/ECON/SW/protobuf-net
+branchName: ProtoGen
+commitRevision: 199130
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: PngToCppConverter
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/Tools/PngToCppConverter
+branchName: trunk/distr
+commitRevision: 497978
+--------------------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------
+folderName: Edes
+baseFolder: /Tools
+localFolderPath: 
+remotePath: Projects/enAbleX1/SW/Tools/Edes
+branchName: trunk/bin/Release
+commitRevision: 542389
+--------------------------------------------------------------------------------------------
+
