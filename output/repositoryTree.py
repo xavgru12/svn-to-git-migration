@@ -17,6 +17,7 @@ import output.transformation
 class RecursiveList:
     def __init__(
         self,
+        #parent: Optional[RecursiveList,
         current: Optional[model.svnRepositoryModel.SvnRepositoryModel],
         dependencies: Optional[RecursiveList],
     ) -> None:
@@ -94,6 +95,15 @@ class RecursiveList:
             logger.debug(50 * "-" + "\n")
             self.print(recursive_list.dependencies)
 
+    def find_node_which_childs_have_no_externals():
+        #when found, checkout current repo, create submodules for all dependencies and upload, then go up to parent and repeat
+        # do this for every "branch" of nodes by iterating over all dependencies
+        # first step: find node and print the node along with some information, best would be to get back to root level showing the complete branch node
+        # second step: find more nodes like this in this branch, show complete node branch
+        # go up the levels until root
+
+        pass
+
     def checkout_git_repositories(
         self, remote_paths, iterator=None
     ):  # remote_paths is not needed at all for git checkout
@@ -129,6 +139,31 @@ class RecursiveList:
 
     def upload_subfolder_repositories(self, repositories):
         output.external_subfolder_migration.migrate(repositories)
+
+    def find_nodes(self, var=None):
+        if var is None:
+            var = True
+        # add a function: has_dependencies(return bool)
+        # for each dependency check again: has_dependencies
+        # if has dependency: add and commit (make a function that prints add and comment)
+        # do for each on this node_level. if done, go to parent and do add and commit immediately,
+        # since we already made sure all the child nodes are checked
+
+        if self.dependencies:
+            print("has dependencies")
+            print("current: ")
+            print(self.current)
+            for dependency in self.dependencies:
+                #if dependency.dependencies
+                dependency.find_nodes(var)
+        else:
+            print("no more dependencies")
+            print("current: ")
+            print(self.current)
+            # go up routine
+
+        #add and commit all dependencies in self.dependencies
+        # go up routine
 
 
 class RepositoryTree:
@@ -198,3 +233,6 @@ class RepositoryTree:
             self.get_list_of_repositories_recursively()
 
         self.recursive_list.upload_subfolder_repositories(self.repositories)
+
+    def find_nodes_recursively(self):
+        self.recursive_list.find_nodes()
