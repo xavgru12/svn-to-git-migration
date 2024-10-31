@@ -151,6 +151,7 @@ class RecursiveList:
         # since we already made sure all the child nodes are checked
 
         if var is None:
+            local_folder_path = self.current.local_folder_path
             self.checkout_top_repository()
 
         if self.dependencies:
@@ -158,9 +159,11 @@ class RecursiveList:
             print("current: ")
             print(self.current)
             for dependency in self.dependencies:
-                #if dependency.dependencies
                 dependency.find_nodes("test")
-                self.add_submodule(dependency.current)
+                if var is None:
+                    self.add_submodule(dependency.current)
+                else:
+                    self.checkout_helper(dependency.current, local_folder_path)
             #add and commit all dependencies in self.dependencies
             if self.current.folder_name == "ag-mobile-app":
                 print("parsed recursively the mobile app")
@@ -171,7 +174,19 @@ class RecursiveList:
             # print("current: ")
             # print(self.current)
 
-        # go up routine
+
+    def checkout_helper(self, repository, local_path):
+        repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+        repository_name_no_externals = f"{repository_name}-no-externals"
+        working_path = os.path.join(local_path, "helper")
+        # way too complicated, checkout repositories inside tree, create dirs if not exists and delete if exists
+
+        command = f"git clone -b main --depth 1 git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{repository_name}"
+        print(command)
+
+        execution.subprocess_execution.check_output_execute(
+                command, working_path
+            )
 
 
     def checkout_top_repository(self):
@@ -191,7 +206,6 @@ class RecursiveList:
         execution.subprocess_execution.check_output_execute(
                 command, base_directory
             )
-        # git clone git@bitbucket.org:curtisinst/ag-ats-no-externals.git
 
 
     def add_submodule(self, repository):
