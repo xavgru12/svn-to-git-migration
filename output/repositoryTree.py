@@ -157,6 +157,8 @@ class RecursiveList:
                 #if dependency.dependencies
                 dependency.find_nodes(var)
             #add and commit all dependencies in self.dependencies
+            if self.current.folder_name == "ag-mobile-app":
+                print("parsed recurisvely the mobile app")
         else:
             print("no more dependencies")
             print("current: ")
