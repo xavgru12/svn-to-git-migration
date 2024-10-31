@@ -156,13 +156,12 @@ class RecursiveList:
             for dependency in self.dependencies:
                 #if dependency.dependencies
                 dependency.find_nodes(var)
+            #add and commit all dependencies in self.dependencies
         else:
             print("no more dependencies")
             print("current: ")
             print(self.current)
-            # go up routine
 
-        #add and commit all dependencies in self.dependencies
         # go up routine
 
 
