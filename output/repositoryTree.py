@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import Any
 from typing import Optional
 import os
+import shutil
+
 import model.svnRepositoryModel
 import parser.svnRepositoryParser
 import data.configuration as configuration
@@ -12,7 +14,10 @@ import output.logger
 import output.external_subfolder_migration
 import parser.branchConfigurationParser
 import output.transformation
+import execution.subprocess_execution
+import execution.shutil_execution
 
+import pdb
 
 class RecursiveList:
     def __init__(
@@ -141,13 +146,12 @@ class RecursiveList:
         output.external_subfolder_migration.migrate(repositories)
 
     def find_nodes(self, var=None):
-        if var is None:
-            var = True
-        # add a function: has_dependencies(return bool)
-        # for each dependency check again: has_dependencies
         # if has dependency: add and commit (make a function that prints add and comment)
         # do for each on this node_level. if done, go to parent and do add and commit immediately,
         # since we already made sure all the child nodes are checked
+
+        if var is None:
+            self.checkout_top_repository()
 
         if self.dependencies:
             print("has dependencies")
@@ -155,17 +159,44 @@ class RecursiveList:
             print(self.current)
             for dependency in self.dependencies:
                 #if dependency.dependencies
-                dependency.find_nodes(var)
+                dependency.find_nodes("test")
+                self.add_submodule(dependency.current)
             #add and commit all dependencies in self.dependencies
             if self.current.folder_name == "ag-mobile-app":
-                print("parsed recurisvely the mobile app")
+                print("parsed recursively the mobile app")
+            # git commit and git push, save updated commit hash in repository model
         else:
-            print("no more dependencies")
-            print("current: ")
-            print(self.current)
+            pass
+            # print("no more dependencies")
+            # print("current: ")
+            # print(self.current)
 
         # go up routine
 
+
+    def checkout_top_repository(self):
+        repository = self.current
+        repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+        repository_name_no_externals = f"{repository_name}-no-externals"
+
+        local_folder_path = repository.local_folder_path
+        folder_name = os.path.basename(local_folder_path)
+        base_directory = os.path.dirname(local_folder_path)
+
+        execution.shutil_execution.delete(local_folder_path)
+
+        command = f"git clone -b main --depth 1 git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+        print(command)
+
+        execution.subprocess_execution.check_output_execute(
+                command, base_directory
+            )
+        # git clone git@bitbucket.org:curtisinst/ag-ats-no-externals.git
+
+
+    def add_submodule(self, repository):
+        print(f"git submodule add {repository.folder_name}")
+        # git checkout
 
 class RepositoryTree:
     recursive_list = Optional[RecursiveList]
