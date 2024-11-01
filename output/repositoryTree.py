@@ -151,7 +151,6 @@ class RecursiveList:
         # since we already made sure all the child nodes are checked
 
         if var is None:
-            local_folder_path = self.current.local_folder_path
             self.checkout_top_repository()
 
         if self.dependencies:
@@ -160,10 +159,9 @@ class RecursiveList:
             print(self.current)
             for dependency in self.dependencies:
                 dependency.find_nodes("test")
-                if var is None:
-                    self.add_submodule(dependency.current)
-                else:
-                    self.checkout_helper(dependency.current, local_folder_path)
+
+                self.add_submodule(dependency.current)
+
             #add and commit all dependencies in self.dependencies
             if self.current.folder_name == "ag-mobile-app":
                 print("parsed recursively the mobile app")
@@ -209,8 +207,84 @@ class RecursiveList:
 
 
     def add_submodule(self, repository):
-        print(f"git submodule add {repository.folder_name}")
-        # git checkout
+        repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+        repository_name_no_externals = f"{repository_name}-no-externals"
+
+        local_folder_path = repository.local_folder_path
+        folder_name = repository.folder_name
+        # base_directory = os.path.dirname(local_folder_path)
+
+        # if folder_name == "Core":
+        #     breakpoint()
+
+        # if local_folder_path == "C:\gitCheckoutTest\ag-mobile-app/Econ/Econ":
+        #     breakpoint()
+
+        root_git_path = self.get_root_git_path(local_folder_path)
+        subpath = local_folder_path[len(root_git_path) + 1:]
+        print(subpath)
+        # relative_path = os.path.relpath(root_git_path, local_folder_path)
+        
+        # print(relative_path)
+
+
+        self.git_delete_folder(folder_name, local_folder_path, subpath, root_git_path)
+        execution.shutil_execution.delete(os.path.join(local_folder_path, folder_name))
+        os.makedirs(local_folder_path, exist_ok=True)
+
+        command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+        print(command)
+
+        execution.subprocess_execution.check_output_execute(
+                command, local_folder_path
+            )
+
+    def get_root_git_path(self, local_folder_path):
+        local_path = configuration.get_local_path()
+        remove_folder = local_folder_path
+        root_git_path = local_folder_path
+
+        while remove_folder != local_path:
+            root_git_path = remove_folder
+            remove_folder = os.path.dirname(remove_folder)
+
+        # root_git_path =
+        print(f"root git path: {root_git_path}")
+        return root_git_path
+
+
+    def git_delete_folder(self, folder, path, relative_path, root_git_path):
+        if os.path.exists(os.path.join(path, folder)):
+            command = f"git rm {folder} -rf"
+            execution.subprocess_execution.check_output_execute(
+                    command, path
+                )
+            # if folder == "Core":
+            #     breakpoint()
+            execution.shutil_execution.delete(os.path.join(root_git_path, f".git/modules/{relative_path}/{folder}"))
+            # command = f"rm -rf .git/modules/{folder}" 
+            # execution.subprocess_execution.check_output_execute(
+            #         command, path
+            #     )
+            # command = f"git config --remove-section submodule.{folder}"
+            # execution.subprocess_execution.check_output_execute(
+            #         command, path
+            #     )
+
+
+
+    def get_list_of_submodules(path):
+        command = "git config --file .gitmodules --name-only --get-regexp path"
+        output = execution.subprocess_execution.check_output_execute(
+                command, path
+            )
+        submodules = []
+        for line in output:
+            submodule = line.replace("\n", "").replace("submodule.", "").replace(".path", "")
+            submodules.append(submodule)
+        
+        return submodules
+        
 
 class RepositoryTree:
     recursive_list = Optional[RecursiveList]
