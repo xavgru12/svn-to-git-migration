@@ -212,21 +212,10 @@ class RecursiveList:
 
         local_folder_path = repository.local_folder_path
         folder_name = repository.folder_name
-        # base_directory = os.path.dirname(local_folder_path)
-
-        # if folder_name == "Core":
-        #     breakpoint()
-
-        # if local_folder_path == "C:\gitCheckoutTest\ag-mobile-app/Econ/Econ":
-        #     breakpoint()
 
         root_git_path = self.get_root_git_path(local_folder_path)
         subpath = local_folder_path[len(root_git_path) + 1:]
         print(subpath)
-        # relative_path = os.path.relpath(root_git_path, local_folder_path)
-        
-        # print(relative_path)
-
 
         self.git_delete_folder(folder_name, local_folder_path, subpath, root_git_path)
         execution.shutil_execution.delete(os.path.join(local_folder_path, folder_name))
@@ -248,7 +237,6 @@ class RecursiveList:
             root_git_path = remove_folder
             remove_folder = os.path.dirname(remove_folder)
 
-        # root_git_path =
         print(f"root git path: {root_git_path}")
         return root_git_path
 
@@ -259,18 +247,7 @@ class RecursiveList:
             execution.subprocess_execution.check_output_execute(
                     command, path
                 )
-            # if folder == "Core":
-            #     breakpoint()
             execution.shutil_execution.delete(os.path.join(root_git_path, f".git/modules/{relative_path}/{folder}"))
-            # command = f"rm -rf .git/modules/{folder}" 
-            # execution.subprocess_execution.check_output_execute(
-            #         command, path
-            #     )
-            # command = f"git config --remove-section submodule.{folder}"
-            # execution.subprocess_execution.check_output_execute(
-            #         command, path
-            #     )
-
 
 
     def get_list_of_submodules(path):
