@@ -16,6 +16,7 @@ import parser.branchConfigurationParser
 import output.transformation
 import execution.subprocess_execution
 import execution.shutil_execution
+import execution.git_execution
 
 import pdb
 
@@ -149,6 +150,7 @@ class RecursiveList:
         if var is None:
             self.checkout_top_repository()
 
+        # checkout submodule no externals of self.current (if var is not None), a git clone is good here(folder will be deleted by add_submodule in parent recusrivelist)
         if self.dependencies:
             print("has dependencies")
             print("current: ")
@@ -156,18 +158,63 @@ class RecursiveList:
             for dependency in self.dependencies:
                 dependency.find_nodes("test")
 
+                # inside add submodule: checkout submodule as live repository
                 self.add_submodule(dependency.current)
+
+            if self.current.folder_name == "ag-mobile-app":
+                print("parsed recursively the mobile app")
 
             #add and commit all dependencies in self.dependencies
             # git commit and git push, save updated commit hash in repository model
-            if self.current.folder_name == "ag-mobile-app":
-                print("parsed recursively the mobile app")
+            self.create_and_push_commit(self.current)
+            # example EconCore:  /EconCore/EmbeddedDB, EconCore/Logic/RemoteControl, need to create repository first and then add its dependencies
         else:
             pass
             # print("no more dependencies")
             # print("current: ")
             # print(self.current)
 
+        # self.create_and_push_commit()
+        #git add, commit, push real git repos here, git rev parse commit hash and save in repository model
+
+    def create_and_push_commit(self, repository):
+        print("push repository:")
+        print(repository)
+        working_directory = os.path.join(repository.local_folder_path, repository.folder_name)
+        repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+
+        add_command = "git add -A"
+        execution.subprocess_execution.check_output_execute(
+                add_command, working_directory
+            )
+
+        commit_command = ["git", "commit", "-m", "activate git submodules"]
+        execution.subprocess_execution.check_output_execute(
+                commit_command, working_directory
+            )
+        
+        print_mode = True
+
+        execution.git_execution.add_remote_upload(repository_name, working_directory)
+        if execution.git_execution.check_remote_upload_exists(working_directory):
+            push_command = "git push upload main --force"
+            execution.subprocess_execution.check_output_execute(
+                    push_command, working_directory
+                )
+        else:
+            if print_mode:
+                self.add_missing_remote_to_file(repository_name)
+                print(f"added missing remote: {repository_name}")
+            else:
+                raise ValueError(
+                    f'error: remote origin for repository: "{repository_name}" does not exist'
+                )
+
+    def add_missing_remote_to_file(self, name):
+        file_path = "remotes.txt"
+
+        with open(file_path, "a") as file:
+            file.write(f"{name}\n")
 
     def checkout_top_repository(self):
         repository = self.current
