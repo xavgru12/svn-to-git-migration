@@ -146,10 +146,6 @@ class RecursiveList:
         output.external_subfolder_migration.migrate(repositories)
 
     def find_nodes(self, var=None):
-        # if has dependency: add and commit (make a function that prints add and comment)
-        # do for each on this node_level. if done, go to parent and do add and commit immediately,
-        # since we already made sure all the child nodes are checked
-
         if var is None:
             self.checkout_top_repository()
 
@@ -163,9 +159,9 @@ class RecursiveList:
                 self.add_submodule(dependency.current)
 
             #add and commit all dependencies in self.dependencies
+            # git commit and git push, save updated commit hash in repository model
             if self.current.folder_name == "ag-mobile-app":
                 print("parsed recursively the mobile app")
-            # git commit and git push, save updated commit hash in repository model
         else:
             pass
             # print("no more dependencies")
