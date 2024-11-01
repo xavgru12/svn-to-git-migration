@@ -195,6 +195,10 @@ class RecursiveList:
         local_folder_path = repository.local_folder_path
         folder_name = repository.folder_name
 
+        if folder_name.endswith(".cs"):
+            print(f"path is file (no submodule): {folder_name}")
+            return
+
         root_git_path = self.get_root_git_path(local_folder_path)
         subpath = local_folder_path[len(root_git_path) + 1:]
         print(subpath)
