@@ -173,20 +173,6 @@ class RecursiveList:
             # print(self.current)
 
 
-    def checkout_helper(self, repository, local_path):
-        repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
-        repository_name_no_externals = f"{repository_name}-no-externals"
-        working_path = os.path.join(local_path, "helper")
-        # way too complicated, checkout repositories inside tree, create dirs if not exists and delete if exists
-
-        command = f"git clone -b main --depth 1 git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{repository_name}"
-        print(command)
-
-        execution.subprocess_execution.check_output_execute(
-                command, working_path
-            )
-
-
     def checkout_top_repository(self):
         repository = self.current
         repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
@@ -248,19 +234,6 @@ class RecursiveList:
                     command, path
                 )
             execution.shutil_execution.delete(os.path.join(root_git_path, f".git/modules/{relative_path}/{folder}"))
-
-
-    def get_list_of_submodules(path):
-        command = "git config --file .gitmodules --name-only --get-regexp path"
-        output = execution.subprocess_execution.check_output_execute(
-                command, path
-            )
-        submodules = []
-        for line in output:
-            submodule = line.replace("\n", "").replace("submodule.", "").replace(".path", "")
-            submodules.append(submodule)
-        
-        return submodules
         
 
 class RepositoryTree:
