@@ -151,6 +151,9 @@ class RecursiveList:
             self.checkout_top_repository()
 
         # checkout submodule no externals of self.current (if var is not None), a git clone is good here(folder will be deleted by add_submodule in parent recusrivelist)
+        if var is not None:
+            self.clone_repository(self.current)
+
         if self.dependencies:
             print("has dependencies")
             print("current: ")
@@ -166,7 +169,8 @@ class RecursiveList:
 
             #add and commit all dependencies in self.dependencies
             # git commit and git push, save updated commit hash in repository model
-            self.create_and_push_commit(self.current)
+            if var is not None:
+                self.create_and_push_commit(self.current)
             # example EconCore:  /EconCore/EmbeddedDB, EconCore/Logic/RemoteControl, need to create repository first and then add its dependencies
         else:
             pass
@@ -176,6 +180,24 @@ class RecursiveList:
 
         # self.create_and_push_commit()
         #git add, commit, push real git repos here, git rev parse commit hash and save in repository model
+
+    def clone_repository(self, repository):
+        repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+        repository_name_no_externals = f"{repository_name}-no-externals"
+        clone_command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{repository.folder_name}"
+
+        folder_name = repository.folder_name
+
+        if folder_name.endswith(".cs"):
+            print(f"path is file (no submodule): {folder_name}")
+            return
+
+        os.makedirs(repository.local_folder_path, exist_ok=True)
+
+        execution.subprocess_execution.check_output_execute(
+                clone_command, repository.local_folder_path
+            )
+
 
     def create_and_push_commit(self, repository):
         print("push repository:")
