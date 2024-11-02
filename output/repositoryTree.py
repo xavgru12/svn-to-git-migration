@@ -149,6 +149,7 @@ class RecursiveList:
     def find_nodes(self, var=None):
         if var is None:
             self.checkout_top_repository()
+        # the commit hash of the repositories need to be updated and the submodules without externals need to be checked out
 
         # checkout submodule no externals of self.current (if var is not None), a git clone is good here(folder will be deleted by add_submodule in parent recusrivelist)
         if var is not None:
