@@ -102,7 +102,7 @@ def upload_subfolder(
     remote_exists = execution.git_execution.check_remote_upload_exists(destination_path)
     if remote_exists is False:
         if print_mode:
-            add_missing_remote_to_file(destination_name)
+            execution.git_execution.add_missing_remote_to_file(destination_name)
             print(f"added missing remote: {destination_name}")
         else:
             raise ValueError(

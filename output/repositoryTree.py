@@ -154,6 +154,7 @@ class RecursiveList:
         # checkout submodule no externals of self.current (if var is not None), a git clone is good here(folder will be deleted by add_submodule in parent recusrivelist)
         if var is not None:
             self.clone_repository(self.current)
+            # in function above: needs to be git push to live repo so in add_submodule the repo exists and can be checked out
 
         if self.dependencies:
             print("has dependencies")
@@ -185,19 +186,42 @@ class RecursiveList:
     def clone_repository(self, repository):
         repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
         repository_name_no_externals = f"{repository_name}-no-externals"
-        clone_command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{repository.folder_name}"
-
         folder_name = repository.folder_name
+        local_folder_path = repository.local_folder_path
+
+        clone_command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
 
         if folder_name.endswith(".cs"):
             print(f"path is file (no submodule): {folder_name}")
             return
 
-        os.makedirs(repository.local_folder_path, exist_ok=True)
+        os.makedirs(local_folder_path, exist_ok=True)
 
         execution.subprocess_execution.check_output_execute(
-                clone_command, repository.local_folder_path
+                clone_command, local_folder_path
             )
+        
+        repository_folder = os.path.join(local_folder_path, folder_name)
+
+        print_mode = True
+
+        execution.git_execution.add_remote_upload(repository_name, repository_folder)
+        if execution.git_execution.check_remote_upload_exists(repository_folder):
+            push_repository_as_live = "git push upload --mirror"
+            execution.subprocess_execution.check_output_execute(
+                    push_repository_as_live, repository_folder
+                )
+        else:
+            if print_mode:
+                self.add_missing_remote_to_file(repository_name)
+                print(f"added missing remote: {repository_name}")
+            else:
+                raise ValueError(
+                    f'error: remote origin for repository: "{repository_name}" does not exist'
+                )
+
+
+
 
 
     def create_and_push_commit(self, repository):
@@ -277,7 +301,7 @@ class RecursiveList:
         execution.shutil_execution.delete(os.path.join(local_folder_path, folder_name))
         os.makedirs(local_folder_path, exist_ok=True)
 
-        command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+        command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name}.git ./{folder_name}"
         print(command)
 
         execution.subprocess_execution.check_output_execute(
