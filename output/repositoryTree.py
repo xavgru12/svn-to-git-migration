@@ -172,7 +172,10 @@ class RecursiveList:
             #add and commit all dependencies in self.dependencies
             # git commit and git push, save updated commit hash in repository model
             if var is not None:
-                self.create_and_push_commit(self.current)
+                working_directory = os.path.join(self.current.local_folder_path, self.current.folder_name)
+            else:
+                working_directory = self.current.local_folder_path
+            self.create_and_push_commit(self.current, working_directory)
             # example EconCore:  /EconCore/EmbeddedDB, EconCore/Logic/RemoteControl, need to create repository first and then add its dependencies
         else:
             pass
@@ -224,10 +227,9 @@ class RecursiveList:
 
 
 
-    def create_and_push_commit(self, repository):
+    def create_and_push_commit(self, repository, working_directory):
         print("push repository:")
         print(repository)
-        working_directory = os.path.join(repository.local_folder_path, repository.folder_name)
         repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
 
         add_command = "git add -A"
@@ -280,6 +282,7 @@ class RecursiveList:
         execution.subprocess_execution.check_output_execute(
                 command, base_directory
             )
+        execution.git_execution.add_remote_upload(repository_name, local_folder_path)
 
 
     def add_submodule(self, repository):
