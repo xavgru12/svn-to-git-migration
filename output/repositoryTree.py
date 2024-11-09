@@ -274,7 +274,7 @@ class RecursiveList:
 
         execution.shutil_execution.delete(local_folder_path)
 
-        command = f"git clone -b main --depth 1 git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+        command = f"git clone git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
         print(command)
 
         execution.subprocess_execution.check_output_execute(
