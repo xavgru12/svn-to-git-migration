@@ -226,7 +226,7 @@ class RecursiveList:
 
 
 
-
+    #todo: update commit in model, check if commit "activate git submodules already exist(find commit children)"
     def create_and_push_commit(self, repository, working_directory):
         print("push repository:")
         print(repository)
