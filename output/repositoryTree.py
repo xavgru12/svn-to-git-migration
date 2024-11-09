@@ -242,7 +242,7 @@ class RecursiveList:
         
         print_mode = True
 
-        execution.git_execution.add_remote_upload(repository_name, working_directory)
+        #execution.git_execution.add_remote_upload(repository_name, working_directory)
         if execution.git_execution.check_remote_upload_exists(working_directory):
             push_command = "git push upload main --force"
             execution.subprocess_execution.check_output_execute(
