@@ -139,7 +139,7 @@ class RecursiveList:
 
     def find_nodes(self, var=None):
         if var is None:
-            self.checkout_top_repository()
+            self.checkout_top_repository(self.current)
 
         if var is not None:
             self.clone_repository(self.current)
@@ -243,8 +243,7 @@ class RecursiveList:
         with open(file_path, "a") as file:
             file.write(f"{name}\n")
 
-    def checkout_top_repository(self):
-        repository = self.current
+    def checkout_top_repository(self, repository):
         repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
         repository_name_no_externals = f"{repository_name}-no-externals"
 
