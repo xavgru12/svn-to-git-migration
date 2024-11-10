@@ -23,7 +23,6 @@ import pdb
 class RecursiveList:
     def __init__(
         self,
-        #parent: Optional[RecursiveList,
         current: Optional[model.svnRepositoryModel.SvnRepositoryModel],
         dependencies: Optional[RecursiveList],
     ) -> None:
@@ -101,14 +100,6 @@ class RecursiveList:
             logger.debug(50 * "-" + "\n")
             self.print(recursive_list.dependencies)
 
-    def find_node_which_childs_have_no_externals():
-        #when found, checkout current repo, create submodules for all dependencies and upload, then go up to parent and repeat
-        # do this for every "branch" of nodes by iterating over all dependencies
-        # first step: find node and print the node along with some information, best would be to get back to root level showing the complete branch node
-        # second step: find more nodes like this in this branch, show complete node branch
-        # go up the levels until root
-
-        pass
 
     def checkout_git_repositories(
         self, remote_paths, iterator=None
@@ -149,12 +140,9 @@ class RecursiveList:
     def find_nodes(self, var=None):
         if var is None:
             self.checkout_top_repository()
-        # the commit hash of the repositories need to be updated and the submodules without externals need to be checked out
 
-        # checkout submodule no externals of self.current (if var is not None), a git clone is good here(folder will be deleted by add_submodule in parent recusrivelist)
         if var is not None:
             self.clone_repository(self.current)
-            # in function above: needs to be git push to live repo so in add_submodule the repo exists and can be checked out
 
         if self.dependencies:
             print("has dependencies")
@@ -163,28 +151,22 @@ class RecursiveList:
             for dependency in self.dependencies:
                 dependency.find_nodes("test")
 
-                # inside add submodule: checkout submodule as live repository
                 self.add_submodule(dependency.current)
 
             if self.current.folder_name == "ag-mobile-app":
                 print("parsed recursively the mobile app")
 
-            #add and commit all dependencies in self.dependencies
-            # git commit and git push, save updated commit hash in repository model
             if var is not None:
                 working_directory = os.path.join(self.current.local_folder_path, self.current.folder_name)
             else:
                 working_directory = self.current.local_folder_path
             self.create_and_push_commit(self.current, working_directory)
-            # example EconCore:  /EconCore/EmbeddedDB, EconCore/Logic/RemoteControl, need to create repository first and then add its dependencies
         else:
             pass
             # print("no more dependencies")
             # print("current: ")
             # print(self.current)
 
-        # self.create_and_push_commit()
-        #git add, commit, push real git repos here, git rev parse commit hash and save in repository model
 
     def clone_repository(self, repository):
         repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
@@ -224,9 +206,6 @@ class RecursiveList:
                 )
 
 
-
-
-    #todo: update commit in model, check if commit "activate git submodules already exist(find commit children)"
     def create_and_push_commit(self, repository, working_directory):
         print("push repository:")
         print(repository)
@@ -244,7 +223,6 @@ class RecursiveList:
         
         print_mode = True
 
-        #execution.git_execution.add_remote_upload(repository_name, working_directory)
         if execution.git_execution.check_remote_upload_exists(working_directory):
             push_command = "git push upload main --force"
             execution.subprocess_execution.check_output_execute(
@@ -287,7 +265,6 @@ class RecursiveList:
 
     def add_submodule(self, repository):
         repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
-        repository_name_no_externals = f"{repository_name}-no-externals"
 
         local_folder_path = repository.local_folder_path
         folder_name = repository.folder_name
