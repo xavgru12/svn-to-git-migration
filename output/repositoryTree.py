@@ -7,7 +7,7 @@ import shutil
 import model.svnRepositoryModel
 import parser.svnRepositoryParser
 import data.configuration as configuration
-import output.gitCheckout
+import output.git_checkout
 import output.migration
 import output.logger
 
@@ -110,13 +110,13 @@ class RecursiveList:
                 f"checkout git top: {iterator[0].current.remote_path}"
             )  # self.current.remote_path
             # need to inverse the recursive list here
-            output.gitCheckout.checkout(self.current)
+            output.git_checkout.checkout(self.current)
             print()
 
         for recursive_list in iterator:
             for dependency in recursive_list.dependencies:
                 print(f"checkout git: {dependency.current.remote_path}")
-                output.gitCheckout.checkout(dependency.current)
+                output.git_checkout.checkout(dependency.current)
                 print()
 
             self.checkout_git_repositories(remote_paths, recursive_list.dependencies)
