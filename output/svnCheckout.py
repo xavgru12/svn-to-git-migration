@@ -20,8 +20,9 @@ def checkout_each_external(repository):
     """
     os.makedirs(repository.local_folder_path, exist_ok=True)
     print(f"Started svn external checkout: {repository.folder_name}")
-    if repository.commit_revision is not None:
-        revision = f"-r {repository.commit_revision}"
+    commit_revision = repository.commit_revision.replace("r", "")
+    if commit_revision is not None:
+        revision = f"-r {commit_revision}"
     else:
         revision = ""
 

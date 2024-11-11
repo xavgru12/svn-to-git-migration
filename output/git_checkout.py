@@ -160,8 +160,11 @@ def add_submodule(repository):
 
     migration_repository_path = os.path.join(migration_output_path, repository_name)
 
-    find_commit_hash_command = f"git svn find-rev r{repository.commit_revision}"
-    commit_hash = execution.subprocess_execution.check_output_execute(find_commit_hash_command, migration_repository_path)
+    if "r" in repository.commit_revision:
+        find_commit_hash_command = f"git svn find-rev {repository.commit_revision}"
+        commit_hash = execution.subprocess_execution.check_output_execute(find_commit_hash_command, migration_repository_path)
+    else:
+        commit_hash = repository.commit_revision
 
     checkout_command = f"git checkout {commit_hash}"
     execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
@@ -202,6 +205,15 @@ def create_and_push_commit(repository, working_directory):
             raise ValueError(
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
+    
+    find_created_commit_hash_command = "git rev-parse HEAD"
+
+    created_commit_hash = execution.subprocess_execution.check_output_execute(
+                find_created_commit_hash_command, working_directory
+            )
+    
+    created_commit_hash = created_commit_hash.strip().replace("\n", "")
+    repository.commit_revision = created_commit_hash
 
 
 def add_missing_remote_to_file(name):

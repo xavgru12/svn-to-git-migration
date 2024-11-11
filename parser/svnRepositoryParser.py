@@ -7,6 +7,7 @@ import output.logger
 
 
 def parse(remote_url, local_path, commit_revision):
+    commit_revision = commit_revision.replace("r", "")
     external_information, remote_url = get_external_info_from_server(
         remote_url, local_path, commit_revision
     )
