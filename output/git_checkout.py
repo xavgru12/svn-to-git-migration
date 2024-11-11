@@ -190,7 +190,7 @@ def create_and_push_commit(repository, working_directory):
     print_mode = True
 
     if execution.git_execution.check_remote_upload_exists(working_directory):
-        push_command = "git push upload main --force"
+        push_command = "git push upload --mirror"
         execution.subprocess_execution.check_output_execute(
                 push_command, working_directory
             )
