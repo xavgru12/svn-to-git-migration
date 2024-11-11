@@ -135,6 +135,7 @@ def add_submodule(repository):
 
     local_folder_path = repository.local_folder_path
     folder_name = repository.folder_name
+    repository_path = os.path.join(local_folder_path, folder_name)
 
     if folder_name.endswith(".cs"):
         print(f"path is file (no submodule): {folder_name}")
@@ -154,6 +155,45 @@ def add_submodule(repository):
     execution.subprocess_execution.check_output_execute(
             command, local_folder_path
         )
+
+    migration_output_path = configuration.get_migration_output_path()
+
+    migration_repository_path = os.path.join(migration_output_path, repository_name)
+
+    find_commit_hash_command = f"git svn find-rev r{repository.commit_revision}"
+    commit_hash = execution.subprocess_execution.check_output_execute(find_commit_hash_command, migration_repository_path)
+
+    checkout_command = f"git checkout {commit_hash}"
+    execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
+
+    print("submodule was added:")
+    print(f"path: {repository_path}")
+    print(f"revision: {repository.commit_revision}")
+    print(f"commit hash: {commit_hash}")
+
+    # git svn find-rev r<change number>
+
+
+    # bad approach:
+    # branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
+    #     repository_path
+    # )
+    # branches = branch_name_conversion.create_branches_dictionary()
+    # tags = branch_name_conversion.create_tags_dictionary()
+
+
+    # try:
+    #     branches[repository.branch_name]
+    # except: 
+    #     breakpoint()
+    # external_checker = output.external_checker.ExternalChecker(
+    #     repository.branch_name, branches.keys(), tags.keys(), repository.remote_path
+    # )
+
+    # svn_extracted_branch_name = external_checker.get_extracted_branch_name()
+    # git_extracted_branch_name = branches.get(svn_extracted_branch_name)
+    # if git_extracted_branch_name is None:
+    #     git_extracted_branch_name = tags[svn_extracted_branch_name]
 
 
 def create_and_push_commit(repository, working_directory):
