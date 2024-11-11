@@ -171,30 +171,6 @@ def add_submodule(repository):
     print(f"revision: {repository.commit_revision}")
     print(f"commit hash: {commit_hash}")
 
-    # git svn find-rev r<change number>
-
-
-    # bad approach:
-    # branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
-    #     repository_path
-    # )
-    # branches = branch_name_conversion.create_branches_dictionary()
-    # tags = branch_name_conversion.create_tags_dictionary()
-
-
-    # try:
-    #     branches[repository.branch_name]
-    # except: 
-    #     breakpoint()
-    # external_checker = output.external_checker.ExternalChecker(
-    #     repository.branch_name, branches.keys(), tags.keys(), repository.remote_path
-    # )
-
-    # svn_extracted_branch_name = external_checker.get_extracted_branch_name()
-    # git_extracted_branch_name = branches.get(svn_extracted_branch_name)
-    # if git_extracted_branch_name is None:
-    #     git_extracted_branch_name = tags[svn_extracted_branch_name]
-
 
 def create_and_push_commit(repository, working_directory):
     print("push repository:")
