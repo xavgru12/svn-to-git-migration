@@ -133,7 +133,7 @@ class RecursiveList:
     def upload_subfolder_repositories(self, repositories):
         output.external_subfolder_migration.migrate(repositories)
 
-    def find_nodes(self, var=None):
+    def checkout_repositories(self, var=None):
         if var is None:
             output.git_checkout.checkout_top_repository(self.current)
 
@@ -145,7 +145,7 @@ class RecursiveList:
             print("current: ")
             print(self.current)
             for dependency in self.dependencies:
-                dependency.find_nodes("test")
+                dependency.checkout_repositories("test")
 
                 output.git_checkout.add_submodule(dependency.current)
 
@@ -232,5 +232,5 @@ class RepositoryTree:
 
         self.recursive_list.upload_subfolder_repositories(self.repositories)
 
-    def find_nodes_recursively(self):
-        self.recursive_list.find_nodes()
+    def checkout_repositories_recursively(self):
+        self.recursive_list.checkout_repositories()

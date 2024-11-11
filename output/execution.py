@@ -62,7 +62,7 @@ def execute(arguments):
         svnCheckout.checkout_svn_externals(tree.recursive_list)
 
     if arguments.checkout_git:
-        tree.find_nodes_recursively()
+        tree.checkout_repositories_recursively()
 
     if arguments.migrate:
         tree.migrate_repositories_recursively()
