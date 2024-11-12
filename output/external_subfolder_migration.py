@@ -150,14 +150,6 @@ def add_missing_remote_to_file(name):
         file.write(f"{name}\n")
 
 
-def get_commit_hash_from(commit_revision, working_directory):
-    command = f"git svn find-rev r{commit_revision}"
-    output = execution.subprocess_execution.check_output_execute(
-        command, working_directory
-    )
-    return output.strip().replace("\n", "")
-
-
 def reset_to_one_commit_before(commit_hash, repo_path):
     reset_command = f"git reset --hard {commit_hash}^"
     print(reset_command)
