@@ -6,6 +6,7 @@ import output.external_checker
 import execution.shutil_execution
 import execution.subprocess_execution
 import execution.git_execution
+import output.branch_name_conversion
 
 
 def checkout(repository):
@@ -131,8 +132,6 @@ def clone_repository(repository):
         
 
 def add_submodule(repository):
-    repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
-
     local_folder_path = repository.local_folder_path
     folder_name = repository.folder_name
     repository_path = os.path.join(local_folder_path, folder_name)
@@ -149,7 +148,30 @@ def add_submodule(repository):
     execution.shutil_execution.delete(os.path.join(local_folder_path, folder_name))
     os.makedirs(local_folder_path, exist_ok=True)
 
-    command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name}.git ./{folder_name}"
+    repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+    migration_output_path = configuration.get_migration_output_path()
+    migration_repository_path = os.path.join(migration_output_path, repository_name)
+
+
+    branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
+        migration_repository_path
+    )
+    branches = branch_name_conversion.create_branches_dictionary()
+    tags = branch_name_conversion.create_tags_dictionary()
+    external_checker = output.external_checker.ExternalChecker(
+        repository.branch_name, branches.keys(), tags.keys(), repository.remote_path
+    )
+
+    if external_checker.has_subfolder():
+        subfolder = external_checker.get_subfolder()
+        remote_repository_name = parser.branchConfigurationParser.parse_subfolder_repo_name(
+            repository_name, subfolder
+        )
+    else:
+        remote_repository_name = repository_name
+
+
+    command = f"git submodule add --force git@bitbucket.org:curtisinst/{remote_repository_name}.git ./{folder_name}"
     print(command)
 
     execution.subprocess_execution.check_output_execute(
@@ -171,8 +193,8 @@ def add_submodule(repository):
 
     print("submodule was added:")
     print(f"path: {repository_path}")
-    print(f"revision: {repository.commit_revision}")
-    print(f"commit hash: {commit_hash}")
+    print(f"commit_revision: {repository.commit_revision}")
+    print(f"repository_name: {repository_name}")
 
 
 def create_and_push_commit(repository, working_directory):
