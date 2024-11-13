@@ -39,7 +39,7 @@ def migrate_each(repository):
             branches,
             tags,
             repository_name,
-            repository,
+            repository.branch_name,
         )
 
 
@@ -48,10 +48,8 @@ def upload_subfolder(
     branches,
     tags,
     repository_name,
-    repository,
+    repository_branch_name,
 ):
-    repository_branch_name = repository.branch_name
-
     svn_extracted_branch_name = external_checker.get_extracted_branch_name()
     git_extracted_branch_name = branches.get(svn_extracted_branch_name)
     is_tag = False
@@ -99,8 +97,6 @@ def upload_subfolder(
         reset_to_one_commit_before(commit_hash, destination_path)
 
     create_repository_from_external_subfolder(subfolder, destination_path)
-
-    # get commit hash here, save in repository_model
 
     execution.git_execution.add_remote_upload(destination_name, destination_path)
     remote_exists = execution.git_execution.check_remote_upload_exists(destination_path)
@@ -167,6 +163,10 @@ def create_repository_from_external_subfolder(external_subfolder, repo_path):
         raise ValueError(
             f'error: subdirectory does not exist: "{sub_directory}", at: "{repo_path}"'
         )
+
+    filter_command = f"git filter-repo --path {external_subfolder} --force"
+    print(filter_command)
+    execution.subprocess_execution.check_output_execute(filter_command, repo_path)
 
     subfolder_command = (
         f"git filter-repo --subdirectory-filter {external_subfolder} --force"
