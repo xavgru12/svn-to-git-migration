@@ -164,10 +164,6 @@ def create_repository_from_external_subfolder(external_subfolder, repo_path):
             f'error: subdirectory does not exist: "{sub_directory}", at: "{repo_path}"'
         )
 
-    filter_command = f"git filter-repo --path {external_subfolder} --force"
-    print(filter_command)
-    execution.subprocess_execution.check_output_execute(filter_command, repo_path)
-
     subfolder_command = (
         f"git filter-repo --subdirectory-filter {external_subfolder} --force"
     )
