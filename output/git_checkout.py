@@ -1,7 +1,10 @@
 import os
+import re
+import shutil
+import subprocess
+
 import parser.branchConfigurationParser
 import data.configuration as configuration
-import shutil
 import output.external_checker
 import execution.shutil_execution
 import execution.subprocess_execution
@@ -92,7 +95,7 @@ def checkout_top_repository(repository):
         )
     execution.git_execution.add_remote_upload(repository_name, local_folder_path)
 
-
+# put clone repository and add submodule into one function
 def clone_repository(repository):
     repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
     repository_name_no_externals = f"{repository_name}-no-externals"
@@ -162,7 +165,8 @@ def add_submodule(repository):
         repository.branch_name, branches.keys(), tags.keys(), repository.remote_path
     )
 
-    if external_checker.has_subfolder():
+    has_subfolder = external_checker.has_subfolder()
+    if has_subfolder:
         subfolder = external_checker.get_subfolder()
         remote_repository_name = parser.branchConfigurationParser.parse_subfolder_repo_name(
             repository_name, subfolder
@@ -178,15 +182,14 @@ def add_submodule(repository):
             command, local_folder_path
         )
 
-    migration_output_path = configuration.get_migration_output_path()
+    svn_extracted_branch_name = external_checker.get_extracted_branch_name()
+    git_extracted_branch_name = branches.get(svn_extracted_branch_name)
+    is_tag = False
+    if git_extracted_branch_name is None:
+        is_tag = True
+        git_extracted_branch_name = tags[svn_extracted_branch_name]
 
-    migration_repository_path = os.path.join(migration_output_path, repository_name)
-
-    if "r" in repository.commit_revision:
-        find_commit_hash_command = f"git svn find-rev {repository.commit_revision}"
-        commit_hash = execution.subprocess_execution.check_output_execute(find_commit_hash_command, migration_repository_path)
-    else:
-        commit_hash = repository.commit_revision
+    commit_hash = find_commit_hash_by(repository.commit_revision, repository_name, repository_path, has_subfolder, git_extracted_branch_name)
 
     checkout_command = f"git checkout {commit_hash}"
     execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
@@ -195,6 +198,43 @@ def add_submodule(repository):
     print(f"path: {repository_path}")
     print(f"commit_revision: {repository.commit_revision}")
     print(f"repository_name: {repository_name}")
+
+
+def find_commit_hash_by(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name):
+    # if r in and has_subfolder: add the new mechanism, working_directory = repository path
+
+    if "r" in commit_revision_or_hash and has_subfolder:
+        commit_hash = get_matching_commit_hash_from_live_git_repository_by(commit_revision_or_hash, git_branch_name, working_directory)
+        if commit_hash is None:
+            raise ValueError(f"error: could not find commit hash for revision: {commit_revision_or_hash}")
+        return commit_hash
+
+    if "r" in commit_revision_or_hash and not has_subfolder:
+        commit_revision = commit_revision_or_hash
+        find_commit_hash_command = f"git svn find-rev {commit_revision}"
+        migration_output_path = configuration.get_migration_output_path()
+        migration_repository_path = os.path.join(migration_output_path, repository_name)
+        return execution.subprocess_execution.check_output_execute(find_commit_hash_command, migration_repository_path)
+    
+    return commit_revision_or_hash
+
+def get_matching_commit_hash_from_live_git_repository_by(commit_revision, git_branch_name, working_directory):
+    commit_revision = commit_revision.replace("r", "")
+    pattern = f"git-svn-id:.+@{commit_revision}"
+    breakpoint()
+    commits = execution.subprocess_execution.check_output_execute(["git", "rev-list", git_branch_name], working_directory).splitlines()
+    for commit in commits:
+        commit_message = subprocess.check_output(["git", "log","-1", "--format=%B", commit], cwd=working_directory)
+
+        try:
+            commit_message = commit_message.decode("utf-8")
+        except:
+            breakpoint()
+            return
+
+        if re.search(pattern, commit_message):
+            print(f"Matching commit hash: {commit}")
+            return commit
 
 
 def create_and_push_commit(repository, working_directory):
