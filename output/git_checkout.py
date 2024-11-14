@@ -182,14 +182,21 @@ def add_submodule(repository):
             command, local_folder_path
         )
 
-    svn_extracted_branch_name = external_checker.get_extracted_branch_name()
-    git_extracted_branch_name = branches.get(svn_extracted_branch_name)
-    is_tag = False
-    if git_extracted_branch_name is None:
-        is_tag = True
-        git_extracted_branch_name = tags[svn_extracted_branch_name]
+    if not has_subfolder:
+        branch_name = repository.branch_name
+    else:
+        svn_extracted_branch_name = external_checker.get_extracted_branch_name()
+        git_extracted_branch_name = branches.get(svn_extracted_branch_name)
+        is_tag = False
+        if git_extracted_branch_name is None:
+            is_tag = True
+            try:
+                git_extracted_branch_name = tags[svn_extracted_branch_name]
+            except:
+                breakpoint()
+        branch_name = git_extracted_branch_name
 
-    commit_hash = find_commit_hash_by(repository.commit_revision, repository_name, repository_path, has_subfolder, git_extracted_branch_name)
+    commit_hash = find_commit_hash_by(repository.commit_revision, repository_name, repository_path, has_subfolder, branch_name)
 
     checkout_command = f"git checkout {commit_hash}"
     execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
@@ -221,7 +228,7 @@ def find_commit_hash_by(commit_revision_or_hash, repository_name, working_direct
 def get_matching_commit_hash_from_live_git_repository_by(commit_revision, git_branch_name, working_directory):
     commit_revision = commit_revision.replace("r", "")
     pattern = f"git-svn-id:.+@{commit_revision}"
-    breakpoint()
+    
     commits = execution.subprocess_execution.check_output_execute(["git", "rev-list", git_branch_name], working_directory).splitlines()
     for commit in commits:
         commit_message = subprocess.check_output(["git", "log","-1", "--format=%B", commit], cwd=working_directory)
@@ -235,6 +242,7 @@ def get_matching_commit_hash_from_live_git_repository_by(commit_revision, git_br
         if re.search(pattern, commit_message):
             print(f"Matching commit hash: {commit}")
             return commit
+    breakpoint()
 
 
 def create_and_push_commit(repository, working_directory):
