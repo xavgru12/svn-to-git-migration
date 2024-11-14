@@ -165,7 +165,7 @@ def create_repository_from_external_subfolder(external_subfolder, repo_path):
         )
 
     subfolder_command = (
-        f"git filter-repo --subdirectory-filter {external_subfolder} --force"
+        f"git filter-repo --subdirectory-filter {external_subfolder} --force --prune-empty never"
     )
     print(subfolder_command)
     execution.subprocess_execution.check_output_execute(subfolder_command, repo_path)
