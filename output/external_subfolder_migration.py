@@ -122,7 +122,13 @@ def upload_subfolder(
             execution.subprocess_execution.check_output_execute(
                 upload_branch_command, destination_path
             )
-
+        
+        dummy_main_commands = [["git", "checkout", "-b", "dummy_main"], ["git", "commit", "-m", "dummy main", "--allow-empty"], ["git", "push", "upload", "-f", "HEAD"]]
+        for each_command in dummy_main_commands:
+            execution.subprocess_execution.check_output_execute(
+                each_command, destination_path
+            )
+        
 
 def subfolder_exists(subfolder, repo_path):
     path = os.path.join(repo_path, subfolder)
