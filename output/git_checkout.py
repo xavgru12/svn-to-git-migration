@@ -126,7 +126,7 @@ def clone_repository(repository):
             )
     else:
         if print_mode:
-            add_missing_remote_to_file(repository_name)
+            add_missing_remote_to_file(f"clone_repository: {repository_name}: {repository_folder}")
             print(f"added missing remote: {repository_name}")
         else:
             raise ValueError(
@@ -137,6 +137,8 @@ def clone_repository(repository):
 def add_submodule(repository):
     local_folder_path = repository.local_folder_path
     folder_name = repository.folder_name
+    if folder_name == "EconCore":
+        breakpoint()
     repository_path = os.path.join(local_folder_path, folder_name)
 
     if folder_name.endswith(".cs"):
@@ -196,7 +198,14 @@ def add_submodule(repository):
                 breakpoint()
         branch_name = git_extracted_branch_name
 
-    commit_hash = find_commit_hash_by(repository.commit_revision, repository_name, repository_path, has_subfolder, branch_name)
+    if repository_name == "ag-pb-generator":
+        breakpoint()
+
+    if not execution.git_execution.check_remote_upload_exists(repository_path):
+        execution.git_execution.add_remote_upload(remote_repository_name, repository_path)
+
+    commit_hash = find_commit_hash_by(repository.commit_revision, repository_name, repository_path, has_subfolder, branch_name) # error must be here, find commit hash in correct repository
+
 
     checkout_command = f"git checkout {commit_hash}"
     execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
@@ -262,14 +271,16 @@ def create_and_push_commit(repository, working_directory):
     
     print_mode = True
 
+    #execution.git_execution.add_remote_upload(repository_name, working_directory)
     if execution.git_execution.check_remote_upload_exists(working_directory):
         push_command = "git push upload --mirror"
+        print(f"create_and_push_commit: {push_command}")
         execution.subprocess_execution.check_output_execute(
                 push_command, working_directory
             )
     else:
         if print_mode:
-            add_missing_remote_to_file(repository_name)
+            add_missing_remote_to_file(f"create_and_push_commit: {repository_name}: {working_directory}")
             print(f"added missing remote: {repository_name}")
         else:
             raise ValueError(
