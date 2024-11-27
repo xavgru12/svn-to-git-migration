@@ -138,7 +138,7 @@ class RecursiveList:
             output.git_checkout.checkout_top_repository(self.current)
 
         if var is not None:
-            output.git_checkout.add_submodule(self.current)
+            output.git_checkout.clone_repository(self.current)
 
         if self.dependencies:
             print("has dependencies")
