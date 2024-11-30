@@ -137,8 +137,8 @@ def clone_repository(repository):
 def add_submodule(repository):
     local_folder_path = repository.local_folder_path
     folder_name = repository.folder_name
-    if folder_name == "EconCore":
-        breakpoint()
+    # if "EmbeddedDB" in folder_name:
+    #     breakpoint()
     repository_path = os.path.join(local_folder_path, folder_name)
 
     if folder_name.endswith(".cs"):
@@ -183,6 +183,18 @@ def add_submodule(repository):
     execution.subprocess_execution.check_output_execute(
             command, local_folder_path
         )
+    
+    update_submodules_commands = ["git submodule sync --recursive", "git submodule update --init --recursive --remote"]
+    for each_command in update_submodules_commands:
+        execution.subprocess_execution.check_output_execute(
+            each_command, local_folder_path
+        )
+
+    # update_submodules_command = "git submodule update --init --recursive --remote"
+
+    # execution.subprocess_execution.check_output_execute(
+    #         update_submodules_command, local_folder_path
+    #     )
 
     if not has_subfolder:
         branch_name = repository.branch_name
@@ -203,11 +215,20 @@ def add_submodule(repository):
 
     if not execution.git_execution.check_remote_upload_exists(repository_path):
         execution.git_execution.add_remote_upload(remote_repository_name, repository_path)
+    else:
+        execution.git_execution.remove_remote_upload(repository_path)
+        execution.git_execution.add_remote_upload(remote_repository_name, repository_path)
 
-    commit_hash = find_commit_hash_by(repository.commit_revision, repository_name, repository_path, has_subfolder, branch_name) # error must be here, find commit hash in correct repository
+    transformation_path = configuration.get_transformation_output_path()
+    live_repository_path = os.path.join(transformation_path, remote_repository_name)
 
+    commit_hash = find_commit_hash_by(repository.commit_revision, remote_repository_name, live_repository_path, has_subfolder, branch_name) # error must be here, find commit hash in correct repository
+
+    if commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c":
+        breakpoint()
 
     checkout_command = f"git checkout {commit_hash}"
+    print(f"{checkout_command}: at: {repository_path}")
     execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
 
     print("submodule was added:")
@@ -220,7 +241,7 @@ def find_commit_hash_by(commit_revision_or_hash, repository_name, working_direct
     # if r in and has_subfolder: add the new mechanism, working_directory = repository path
 
     if "r" in commit_revision_or_hash and has_subfolder:
-        commit_hash = get_matching_commit_hash_from_live_git_repository_by(commit_revision_or_hash, git_branch_name, working_directory)
+        commit_hash = get_matching_commit_hash_from_live_git_repository_by(commit_revision_or_hash, git_branch_name, working_directory) #error is here, search subfolder repo instead of live repo
         if commit_hash is None:
             raise ValueError(f"error: could not find commit hash for revision: {commit_revision_or_hash}")
         return commit_hash

@@ -40,6 +40,11 @@ def remove_remote_origin(repo_path):
 
     execution.subprocess_execution.check_output_execute(command, repo_path)
 
+def remove_remote_upload(repo_path):
+    command = "git remote remove upload"
+
+    execution.subprocess_execution.check_output_execute(command, repo_path)
+
 
 def fetch(repo_path):
     fetch_command = "git fetch"
