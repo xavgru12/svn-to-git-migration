@@ -224,17 +224,19 @@ def add_submodule(repository):
 
     commit_hash = find_commit_hash_by(repository.commit_revision, remote_repository_name, live_repository_path, has_subfolder, branch_name) # error must be here, find commit hash in correct repository
 
-    if commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c":
+    if commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c":  # embeddeddb wrong commit hash
         breakpoint()
 
     checkout_command = f"git checkout {commit_hash}"
-    print(f"{checkout_command}: at: {repository_path}")
+    print(f"{checkout_command} at: {repository_path}")
     execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
 
     print("submodule was added:")
     print(f"path: {repository_path}")
     print(f"commit_revision: {repository.commit_revision}")
+    print(f"commit_hash: {commit_hash}")
     print(f"repository_name: {repository_name}")
+    print(f"remote_repository_name: {remote_repository_name}")
 
 
 def find_commit_hash_by(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name):
