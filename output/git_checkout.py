@@ -117,8 +117,8 @@ def clone_repository(repository):
     repository_folder = os.path.join(local_folder_path, folder_name)
 
     print_mode = True
-
-    execution.git_execution.add_remote_upload(repository_name, repository_folder)
+    if not execution.git_execution.check_remote_upload_exists(repository_folder):
+        execution.git_execution.add_remote_upload(repository_name, repository_folder)
     if execution.git_execution.check_remote_upload_exists(repository_folder):
         push_repository_as_live = "git push upload --mirror"
         execution.subprocess_execution.check_output_execute(
@@ -225,6 +225,9 @@ def add_submodule(repository):
     commit_hash = find_commit_hash_by(repository.commit_revision, remote_repository_name, live_repository_path, has_subfolder, branch_name) # error must be here, find commit hash in correct repository
 
     if commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c":  # embeddeddb wrong commit hash
+        breakpoint()
+
+    if commit_hash == "6da77de7136ba0fb5688a81c43afef64a0e0e852":
         breakpoint()
 
     checkout_command = f"git checkout {commit_hash}"

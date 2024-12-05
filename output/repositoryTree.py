@@ -146,8 +146,9 @@ class RecursiveList:
             print(self.current)
             for dependency in self.dependencies:
                 dependency.checkout_repositories("test")
-
                 output.git_checkout.add_submodule(dependency.current)
+
+
 
             if self.current.folder_name == "ag-mobile-app":
                 print("parsed recursively the mobile app")
