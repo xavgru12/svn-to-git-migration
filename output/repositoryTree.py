@@ -137,10 +137,10 @@ class RecursiveList:
         if var is None:
             output.git_checkout.checkout_top_repository(self.current)
 
-        if var is not None:
-            output.git_checkout.clone_repository(self.current)
 
         if self.dependencies:
+            if var is not None:
+                output.git_checkout.clone_repository(self.current, True)
             print("has dependencies")
             print("current: ")
             print(self.current)
@@ -160,6 +160,9 @@ class RecursiveList:
             output.git_checkout.create_and_push_commit(self.current, working_directory)
         else:
             pass
+            # if var is not None:
+            #     output.git_checkout.clone_repository(self.current, False)
+
             # print("no more dependencies")
             # print("current: ")
             # print(self.current)

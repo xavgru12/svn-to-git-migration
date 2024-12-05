@@ -96,13 +96,16 @@ def checkout_top_repository(repository):
     execution.git_execution.add_remote_upload(repository_name, local_folder_path)
 
 # put clone repository and add submodule into one function
-def clone_repository(repository):
+def clone_repository(repository, has_dependencies):
     repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
     repository_name_no_externals = f"{repository_name}-no-externals"
     folder_name = repository.folder_name
     local_folder_path = repository.local_folder_path
 
-    clone_command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+    if not has_dependencies:
+        command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+    else:
+        command = f"git clone --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
 
     if folder_name.endswith(".cs"):
         print(f"path is file (no submodule): {folder_name}")
@@ -111,7 +114,7 @@ def clone_repository(repository):
     os.makedirs(local_folder_path, exist_ok=True)
 
     execution.subprocess_execution.check_output_execute(
-            clone_command, local_folder_path
+            command, local_folder_path
         )
     
     repository_folder = os.path.join(local_folder_path, folder_name)
