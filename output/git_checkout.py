@@ -140,10 +140,11 @@ def clone_repository(repository, has_dependencies):
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
 
+    # extract upload functionality from git clone functionality, upload needs to be done in every case
+
     # checkout_commit_hash(
     #     repository.commit_revision,
     #     repository_name,
-    #     working_directory,
     #     has_subfolder,
     #     git_branch_name,
     #     repository_path,
@@ -151,7 +152,6 @@ def clone_repository(repository, has_dependencies):
     #     checkout_commit_hash(
     #     repository.commit_revision,
     #     remote_repository_name,
-    #     live_repository_path,
     #     has_subfolder,
     #     branch_name,
     #     repository_path,
@@ -216,8 +216,6 @@ def add_submodule(repository):
             remote_repository_name, repository_path
         )
 
-    transformation_path = configuration.get_transformation_output_path()
-    live_repository_path = os.path.join(transformation_path, remote_repository_name)
     branch_name = get_branch_name(
         external_checker, repository.branch_name, branches, tags
     )
@@ -225,7 +223,6 @@ def add_submodule(repository):
     checkout_commit_hash(
         repository.commit_revision,
         remote_repository_name,
-        live_repository_path,
         has_subfolder,
         branch_name,
         repository_path,
@@ -304,7 +301,6 @@ def get_branch_name(external_checker, branch_name, branches, tags):
 def checkout_commit_hash(
     commit_revision_or_hash,
     repository_name,
-    working_directory,
     has_subfolder,
     git_branch_name,
     repository_path,
@@ -312,7 +308,6 @@ def checkout_commit_hash(
     commit_hash = find_commit_hash_by(
         commit_revision_or_hash,
         repository_name,
-        working_directory,
         has_subfolder,
         git_branch_name,
     )
@@ -335,10 +330,12 @@ def checkout_commit_hash(
 def find_commit_hash_by(
     commit_revision_or_hash,
     repository_name,
-    working_directory,
     has_subfolder,
     git_branch_name,
 ):
+    transformation_path = configuration.get_transformation_output_path()
+    working_directory = os.path.join(transformation_path, repository_name)
+
     if "r" in commit_revision_or_hash and has_subfolder:
         commit_hash = get_matching_commit_hash_from_live_git_repository_by(
             commit_revision_or_hash, git_branch_name, working_directory
