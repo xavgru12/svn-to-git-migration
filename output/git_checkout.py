@@ -148,6 +148,14 @@ def clone_repository(repository, has_dependencies):
     #     git_branch_name,
     #     repository_path,
     # )
+    #     checkout_commit_hash(
+    #     repository.commit_revision,
+    #     remote_repository_name,
+    #     live_repository_path,
+    #     has_subfolder,
+    #     branch_name,
+    #     repository_path,
+    # )
     # git checkout commit hash needs to be done here, so add submodule embedded db and push commit is done on correct commit
     # clone repository needs to do repository no externals in any case and upload it to remote
     # the else self.dependencies can stay empty since in recursive it is checked out by add_submodule
@@ -195,20 +203,6 @@ def add_submodule(repository):
             each_command, local_folder_path
         )
 
-    if not has_subfolder:
-        branch_name = repository.branch_name
-    else:
-        svn_extracted_branch_name = external_checker.get_extracted_branch_name()
-        git_extracted_branch_name = branches.get(svn_extracted_branch_name)
-        is_tag = False
-        if git_extracted_branch_name is None:
-            is_tag = True
-            try:
-                git_extracted_branch_name = tags[svn_extracted_branch_name]
-            except:
-                breakpoint()
-        branch_name = git_extracted_branch_name
-
     if remote_repository_name == "ag-pb-generator":
         breakpoint()
 
@@ -224,6 +218,9 @@ def add_submodule(repository):
 
     transformation_path = configuration.get_transformation_output_path()
     live_repository_path = os.path.join(transformation_path, remote_repository_name)
+    branch_name = get_branch_name(
+        external_checker, repository.branch_name, branches, tags
+    )
 
     checkout_commit_hash(
         repository.commit_revision,
@@ -286,6 +283,22 @@ def get_remote_repository_name(repository, external_checker):
         remote_repository_name = repository_name
 
     return remote_repository_name
+
+
+def get_branch_name(external_checker, branch_name, branches, tags):
+    if not external_checker.has_subfolder():
+        return branch_name
+
+    svn_extracted_branch_name = external_checker.get_extracted_branch_name()
+    git_extracted_branch_name = branches.get(svn_extracted_branch_name)
+    is_tag = False
+    if git_extracted_branch_name is None:
+        is_tag = True
+        try:
+            git_extracted_branch_name = tags[svn_extracted_branch_name]
+        except:
+            breakpoint()
+    return git_extracted_branch_name
 
 
 def checkout_commit_hash(
