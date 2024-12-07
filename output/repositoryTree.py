@@ -159,6 +159,8 @@ class RecursiveList:
                 working_directory = self.current.local_folder_path
             output.git_checkout.create_and_push_commit(self.current, working_directory)
         else:
+            if var is not None:
+                output.git_checkout.clone_repository(self.current, False)
             pass
             # if var is not None:
             #     output.git_checkout.clone_repository(self.current, False)

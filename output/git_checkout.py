@@ -105,7 +105,7 @@ def clone_repository(repository, has_dependencies):
     if not has_dependencies:
         command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
     else:
-        command = f"git clone --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+        command = f"git clone git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
 
     if folder_name.endswith(".cs"):
         print(f"path is file (no submodule): {folder_name}")
@@ -135,7 +135,9 @@ def clone_repository(repository, has_dependencies):
             raise ValueError(
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
-        
+    # git checkout commit hash needs to be done here, so add submodule embedded db and push commit is done on correct commit
+    # clone repository needs to do repository no externals in any case and upload it to remote
+    # the else self.dependencies can stay empty since in recursive it is checked out by add_submodule
 
 def add_submodule(repository):
     local_folder_path = repository.local_folder_path
@@ -152,7 +154,8 @@ def add_submodule(repository):
     subpath = local_folder_path[len(root_git_path) + 1:]
     print(subpath)
 
-    git_delete_folder(folder_name, local_folder_path, subpath, root_git_path)
+    #breakpoint()
+    #git_delete_folder(folder_name, local_folder_path, subpath, root_git_path)
     execution.shutil_execution.delete(os.path.join(local_folder_path, folder_name))
     os.makedirs(local_folder_path, exist_ok=True)
 
