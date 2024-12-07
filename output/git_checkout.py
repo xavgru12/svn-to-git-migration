@@ -196,12 +196,6 @@ def add_submodule(repository):
             each_command, local_folder_path
         )
 
-    # update_submodules_command = "git submodule update --init --recursive --remote"
-
-    # execution.subprocess_execution.check_output_execute(
-    #         update_submodules_command, local_folder_path
-    #     )
-
     if not has_subfolder:
         branch_name = repository.branch_name
     else:
@@ -228,7 +222,16 @@ def add_submodule(repository):
     transformation_path = configuration.get_transformation_output_path()
     live_repository_path = os.path.join(transformation_path, remote_repository_name)
 
-    commit_hash = find_commit_hash_by(repository.commit_revision, remote_repository_name, live_repository_path, has_subfolder, branch_name) # error must be here, find commit hash in correct repository
+    checkout_commit_hash(repository.commit_revision, remote_repository_name, live_repository_path, has_subfolder, branch_name, repository_path)
+
+    print("submodule was added:")
+    print(f"path: {repository_path}")
+    print(f"commit_revision: {repository.commit_revision}")
+    print(f"repository_name: {repository_name}")
+    print(f"remote_repository_name: {remote_repository_name}")
+
+def checkout_commit_hash(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name, repository_path):
+    commit_hash = find_commit_hash_by(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name)
 
     if commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c":  # embeddeddb wrong commit hash
         breakpoint()
@@ -240,19 +243,10 @@ def add_submodule(repository):
     print(f"{checkout_command} at: {repository_path}")
     execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
 
-    print("submodule was added:")
-    print(f"path: {repository_path}")
-    print(f"commit_revision: {repository.commit_revision}")
-    print(f"commit_hash: {commit_hash}")
-    print(f"repository_name: {repository_name}")
-    print(f"remote_repository_name: {remote_repository_name}")
-
-
 def find_commit_hash_by(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name):
-    # if r in and has_subfolder: add the new mechanism, working_directory = repository path
 
     if "r" in commit_revision_or_hash and has_subfolder:
-        commit_hash = get_matching_commit_hash_from_live_git_repository_by(commit_revision_or_hash, git_branch_name, working_directory) #error is here, search subfolder repo instead of live repo
+        commit_hash = get_matching_commit_hash_from_live_git_repository_by(commit_revision_or_hash, git_branch_name, working_directory)
         if commit_hash is None:
             raise ValueError(f"error: could not find commit hash for revision: {commit_revision_or_hash}")
         return commit_hash
@@ -328,6 +322,8 @@ def create_and_push_commit(repository, working_directory):
     created_commit_hash = created_commit_hash.strip().replace("\n", "")
     repository.commit_revision = created_commit_hash
 
+    # find new commit is only needed, cause new commit is made, better: do git commit --amend to reserve history: 
+    # git upload without force push will not work anymore
 
 def add_missing_remote_to_file(name):
     file_path = "remotes.txt"
