@@ -75,10 +75,13 @@ def set_destination_directory(repository):
     os.makedirs(destination_directory, exist_ok=True)
     return destination_directory
 
+
 ###################################################################################################################
 ## newly added functions
 def checkout_top_repository(repository):
-    repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+    repository_name = parser.branchConfigurationParser.parse_repo_name(
+        repository.remote_path
+    )
     repository_name_no_externals = f"{repository_name}-no-externals"
 
     local_folder_path = repository.local_folder_path
@@ -90,14 +93,15 @@ def checkout_top_repository(repository):
     command = f"git clone git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
     print(command)
 
-    execution.subprocess_execution.check_output_execute(
-            command, base_directory
-        )
+    execution.subprocess_execution.check_output_execute(command, base_directory)
     execution.git_execution.add_remote_upload(repository_name, local_folder_path)
+
 
 # put clone repository and add submodule into one function
 def clone_repository(repository, has_dependencies):
-    repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+    repository_name = parser.branchConfigurationParser.parse_repo_name(
+        repository.remote_path
+    )
     repository_name_no_externals = f"{repository_name}-no-externals"
     folder_name = repository.folder_name
     local_folder_path = repository.local_folder_path
@@ -113,10 +117,8 @@ def clone_repository(repository, has_dependencies):
 
     os.makedirs(local_folder_path, exist_ok=True)
 
-    execution.subprocess_execution.check_output_execute(
-            command, local_folder_path
-        )
-    
+    execution.subprocess_execution.check_output_execute(command, local_folder_path)
+
     repository_folder = os.path.join(local_folder_path, folder_name)
 
     print_mode = True
@@ -125,11 +127,13 @@ def clone_repository(repository, has_dependencies):
     if execution.git_execution.check_remote_upload_exists(repository_folder):
         push_repository_as_live = "git push upload --mirror"
         execution.subprocess_execution.check_output_execute(
-                push_repository_as_live, repository_folder
-            )
+            push_repository_as_live, repository_folder
+        )
     else:
         if print_mode:
-            add_missing_remote_to_file(f"clone_repository: {repository_name}: {repository_folder}")
+            add_missing_remote_to_file(
+                f"clone_repository: {repository_name}: {repository_folder}"
+            )
             print(f"added missing remote: {repository_name}")
         else:
             raise ValueError(
@@ -138,6 +142,7 @@ def clone_repository(repository, has_dependencies):
     # git checkout commit hash needs to be done here, so add submodule embedded db and push commit is done on correct commit
     # clone repository needs to do repository no externals in any case and upload it to remote
     # the else self.dependencies can stay empty since in recursive it is checked out by add_submodule
+
 
 def add_submodule(repository):
     local_folder_path = repository.local_folder_path
@@ -151,18 +156,19 @@ def add_submodule(repository):
         return
 
     root_git_path = get_root_git_path(local_folder_path)
-    subpath = local_folder_path[len(root_git_path) + 1:]
+    subpath = local_folder_path[len(root_git_path) + 1 :]
     print(subpath)
 
-    #breakpoint()
-    #git_delete_folder(folder_name, local_folder_path, subpath, root_git_path)
+    # breakpoint()
+    # git_delete_folder(folder_name, local_folder_path, subpath, root_git_path)
     execution.shutil_execution.delete(os.path.join(local_folder_path, folder_name))
     os.makedirs(local_folder_path, exist_ok=True)
 
-    repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+    repository_name = parser.branchConfigurationParser.parse_repo_name(
+        repository.remote_path
+    )
     migration_output_path = configuration.get_migration_output_path()
     migration_repository_path = os.path.join(migration_output_path, repository_name)
-
 
     branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
         migration_repository_path
@@ -176,21 +182,23 @@ def add_submodule(repository):
     has_subfolder = external_checker.has_subfolder()
     if has_subfolder:
         subfolder = external_checker.get_subfolder()
-        remote_repository_name = parser.branchConfigurationParser.parse_subfolder_repo_name(
-            repository_name, subfolder
+        remote_repository_name = (
+            parser.branchConfigurationParser.parse_subfolder_repo_name(
+                repository_name, subfolder
+            )
         )
     else:
         remote_repository_name = repository_name
 
-
     command = f"git submodule add --force git@bitbucket.org:curtisinst/{remote_repository_name}.git ./{folder_name}"
     print(command)
 
-    execution.subprocess_execution.check_output_execute(
-            command, local_folder_path
-        )
-    
-    update_submodules_commands = ["git submodule sync --recursive", "git submodule update --init --recursive --remote"]
+    execution.subprocess_execution.check_output_execute(command, local_folder_path)
+
+    update_submodules_commands = [
+        "git submodule sync --recursive",
+        "git submodule update --init --recursive --remote",
+    ]
     for each_command in update_submodules_commands:
         execution.subprocess_execution.check_output_execute(
             each_command, local_folder_path
@@ -214,15 +222,26 @@ def add_submodule(repository):
         breakpoint()
 
     if not execution.git_execution.check_remote_upload_exists(repository_path):
-        execution.git_execution.add_remote_upload(remote_repository_name, repository_path)
+        execution.git_execution.add_remote_upload(
+            remote_repository_name, repository_path
+        )
     else:
         execution.git_execution.remove_remote_upload(repository_path)
-        execution.git_execution.add_remote_upload(remote_repository_name, repository_path)
+        execution.git_execution.add_remote_upload(
+            remote_repository_name, repository_path
+        )
 
     transformation_path = configuration.get_transformation_output_path()
     live_repository_path = os.path.join(transformation_path, remote_repository_name)
 
-    checkout_commit_hash(repository.commit_revision, remote_repository_name, live_repository_path, has_subfolder, branch_name, repository_path)
+    checkout_commit_hash(
+        repository.commit_revision,
+        remote_repository_name,
+        live_repository_path,
+        has_subfolder,
+        branch_name,
+        repository_path,
+    )
 
     print("submodule was added:")
     print(f"path: {repository_path}")
@@ -230,10 +249,26 @@ def add_submodule(repository):
     print(f"repository_name: {repository_name}")
     print(f"remote_repository_name: {remote_repository_name}")
 
-def checkout_commit_hash(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name, repository_path):
-    commit_hash = find_commit_hash_by(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name)
 
-    if commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c":  # embeddeddb wrong commit hash
+def checkout_commit_hash(
+    commit_revision_or_hash,
+    repository_name,
+    working_directory,
+    has_subfolder,
+    git_branch_name,
+    repository_path,
+):
+    commit_hash = find_commit_hash_by(
+        commit_revision_or_hash,
+        repository_name,
+        working_directory,
+        has_subfolder,
+        git_branch_name,
+    )
+
+    if (
+        commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c"
+    ):  # embeddeddb wrong commit hash
         breakpoint()
 
     if commit_hash == "6da77de7136ba0fb5688a81c43afef64a0e0e852":
@@ -241,14 +276,26 @@ def checkout_commit_hash(commit_revision_or_hash, repository_name, working_direc
 
     checkout_command = f"git checkout {commit_hash}"
     print(f"{checkout_command} at: {repository_path}")
-    execution.subprocess_execution.check_output_execute(checkout_command, repository_path)
+    execution.subprocess_execution.check_output_execute(
+        checkout_command, repository_path
+    )
 
-def find_commit_hash_by(commit_revision_or_hash, repository_name, working_directory, has_subfolder, git_branch_name):
 
+def find_commit_hash_by(
+    commit_revision_or_hash,
+    repository_name,
+    working_directory,
+    has_subfolder,
+    git_branch_name,
+):
     if "r" in commit_revision_or_hash and has_subfolder:
-        commit_hash = get_matching_commit_hash_from_live_git_repository_by(commit_revision_or_hash, git_branch_name, working_directory)
+        commit_hash = get_matching_commit_hash_from_live_git_repository_by(
+            commit_revision_or_hash, git_branch_name, working_directory
+        )
         if commit_hash is None:
-            raise ValueError(f"error: could not find commit hash for revision: {commit_revision_or_hash}")
+            raise ValueError(
+                f"error: could not find commit hash for revision: {commit_revision_or_hash}"
+            )
         return commit_hash
 
     if "r" in commit_revision_or_hash and not has_subfolder:
@@ -256,17 +303,26 @@ def find_commit_hash_by(commit_revision_or_hash, repository_name, working_direct
         find_commit_hash_command = f"git svn find-rev {commit_revision}"
         migration_output_path = configuration.get_migration_output_path()
         migration_repository_path = os.path.join(migration_output_path, repository_name)
-        return execution.subprocess_execution.check_output_execute(find_commit_hash_command, migration_repository_path)
-    
+        return execution.subprocess_execution.check_output_execute(
+            find_commit_hash_command, migration_repository_path
+        )
+
     return commit_revision_or_hash
 
-def get_matching_commit_hash_from_live_git_repository_by(commit_revision, git_branch_name, working_directory):
+
+def get_matching_commit_hash_from_live_git_repository_by(
+    commit_revision, git_branch_name, working_directory
+):
     commit_revision = commit_revision.replace("r", "")
     pattern = f"git-svn-id:.+@{commit_revision}"
-    
-    commits = execution.subprocess_execution.check_output_execute(["git", "rev-list", git_branch_name], working_directory).splitlines()
+
+    commits = execution.subprocess_execution.check_output_execute(
+        ["git", "rev-list", git_branch_name], working_directory
+    ).splitlines()
     for commit in commits:
-        commit_message = subprocess.check_output(["git", "log","-1", "--format=%B", commit], cwd=working_directory)
+        commit_message = subprocess.check_output(
+            ["git", "log", "-1", "--format=%B", commit], cwd=working_directory
+        )
 
         try:
             commit_message = commit_message.decode("utf-8")
@@ -283,47 +339,50 @@ def get_matching_commit_hash_from_live_git_repository_by(commit_revision, git_br
 def create_and_push_commit(repository, working_directory):
     print("push repository:")
     print(repository)
-    repository_name = parser.branchConfigurationParser.parse_repo_name(repository.remote_path)
+    repository_name = parser.branchConfigurationParser.parse_repo_name(
+        repository.remote_path
+    )
 
     add_command = "git add -A"
-    execution.subprocess_execution.check_output_execute(
-            add_command, working_directory
-        )
+    execution.subprocess_execution.check_output_execute(add_command, working_directory)
 
     commit_command = ["git", "commit", "-m", "activate git submodules"]
     execution.subprocess_execution.check_output_execute(
-            commit_command, working_directory
-        )
-    
+        commit_command, working_directory
+    )
+
     print_mode = True
 
-    #execution.git_execution.add_remote_upload(repository_name, working_directory)
+    # execution.git_execution.add_remote_upload(repository_name, working_directory)
     if execution.git_execution.check_remote_upload_exists(working_directory):
         push_command = "git push upload --mirror"
         print(f"create_and_push_commit: {push_command}")
         execution.subprocess_execution.check_output_execute(
-                push_command, working_directory
-            )
+            push_command, working_directory
+        )
     else:
         if print_mode:
-            add_missing_remote_to_file(f"create_and_push_commit: {repository_name}: {working_directory}")
+            add_missing_remote_to_file(
+                f"create_and_push_commit: {repository_name}: {working_directory}"
+            )
             print(f"added missing remote: {repository_name}")
         else:
             raise ValueError(
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
-    
+
     find_created_commit_hash_command = "git rev-parse HEAD"
 
     created_commit_hash = execution.subprocess_execution.check_output_execute(
-                find_created_commit_hash_command, working_directory
-            )
-    
+        find_created_commit_hash_command, working_directory
+    )
+
     created_commit_hash = created_commit_hash.strip().replace("\n", "")
     repository.commit_revision = created_commit_hash
 
-    # find new commit is only needed, cause new commit is made, better: do git commit --amend to reserve history: 
+    # find new commit is only needed, cause new commit is made, better: do git commit --amend to reserve history:
     # git upload without force push will not work anymore
+
 
 def add_missing_remote_to_file(name):
     file_path = "remotes.txt"
@@ -348,7 +407,7 @@ def get_root_git_path(local_folder_path):
 def git_delete_folder(folder, path, relative_path, root_git_path):
     if os.path.exists(os.path.join(path, folder)):
         command = f"git rm {folder} -rf"
-        execution.subprocess_execution.check_output_execute(
-                command, path
-            )
-        execution.shutil_execution.delete(os.path.join(root_git_path, f".git/modules/{relative_path}/{folder}"))
+        execution.subprocess_execution.check_output_execute(command, path)
+        execution.shutil_execution.delete(
+            os.path.join(root_git_path, f".git/modules/{relative_path}/{folder}")
+        )
