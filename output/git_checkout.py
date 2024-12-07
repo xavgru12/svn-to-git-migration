@@ -139,6 +139,15 @@ def clone_repository(repository, has_dependencies):
             raise ValueError(
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
+
+    # checkout_commit_hash(
+    #     repository.commit_revision,
+    #     repository_name,
+    #     working_directory,
+    #     has_subfolder,
+    #     git_branch_name,
+    #     repository_path,
+    # )
     # git checkout commit hash needs to be done here, so add submodule embedded db and push commit is done on correct commit
     # clone repository needs to do repository no externals in any case and upload it to remote
     # the else self.dependencies can stay empty since in recursive it is checked out by add_submodule
@@ -164,31 +173,13 @@ def add_submodule(repository):
     execution.shutil_execution.delete(os.path.join(local_folder_path, folder_name))
     os.makedirs(local_folder_path, exist_ok=True)
 
-    repository_name = parser.branchConfigurationParser.parse_repo_name(
-        repository.remote_path
-    )
-    migration_output_path = configuration.get_migration_output_path()
-    migration_repository_path = os.path.join(migration_output_path, repository_name)
+    branch_name_conversion = create_branch_name_conversion(repository)
+    branches = create_branches(branch_name_conversion)
+    tags = create_tags(branch_name_conversion)
 
-    branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
-        migration_repository_path
-    )
-    branches = branch_name_conversion.create_branches_dictionary()
-    tags = branch_name_conversion.create_tags_dictionary()
-    external_checker = output.external_checker.ExternalChecker(
-        repository.branch_name, branches.keys(), tags.keys(), repository.remote_path
-    )
-
+    external_checker = create_external_checker(repository, branches, tags)
+    remote_repository_name = get_remote_repository_name(repository, external_checker)
     has_subfolder = external_checker.has_subfolder()
-    if has_subfolder:
-        subfolder = external_checker.get_subfolder()
-        remote_repository_name = (
-            parser.branchConfigurationParser.parse_subfolder_repo_name(
-                repository_name, subfolder
-            )
-        )
-    else:
-        remote_repository_name = repository_name
 
     command = f"git submodule add --force git@bitbucket.org:curtisinst/{remote_repository_name}.git ./{folder_name}"
     print(command)
@@ -218,7 +209,7 @@ def add_submodule(repository):
                 breakpoint()
         branch_name = git_extracted_branch_name
 
-    if repository_name == "ag-pb-generator":
+    if remote_repository_name == "ag-pb-generator":
         breakpoint()
 
     if not execution.git_execution.check_remote_upload_exists(repository_path):
@@ -246,8 +237,55 @@ def add_submodule(repository):
     print("submodule was added:")
     print(f"path: {repository_path}")
     print(f"commit_revision: {repository.commit_revision}")
-    print(f"repository_name: {repository_name}")
+    # print(f"repository_name: {repository_name}")
     print(f"remote_repository_name: {remote_repository_name}")
+
+
+def create_branch_name_conversion(repository):
+    repository_name = parser.branchConfigurationParser.parse_repo_name(
+        repository.remote_path
+    )
+    migration_output_path = configuration.get_migration_output_path()
+    migration_repository_path = os.path.join(migration_output_path, repository_name)
+    branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
+        migration_repository_path
+    )
+    return branch_name_conversion
+
+
+def create_branches(branch_name_conversion):
+    return branch_name_conversion.create_branches_dictionary()
+
+
+def create_tags(branch_name_conversion):
+    return branch_name_conversion.create_tags_dictionary()
+
+
+def create_external_checker(repository, branches, tags):
+    external_checker = output.external_checker.ExternalChecker(
+        repository.branch_name, branches.keys(), tags.keys(), repository.remote_path
+    )
+
+    return external_checker
+
+
+def get_remote_repository_name(repository, external_checker):
+    repository_name = parser.branchConfigurationParser.parse_repo_name(
+        repository.remote_path
+    )
+
+    has_subfolder = external_checker.has_subfolder()
+    if has_subfolder:
+        subfolder = external_checker.get_subfolder()
+        remote_repository_name = (
+            parser.branchConfigurationParser.parse_subfolder_repo_name(
+                repository_name, subfolder
+            )
+        )
+    else:
+        remote_repository_name = repository_name
+
+    return remote_repository_name
 
 
 def checkout_commit_hash(
