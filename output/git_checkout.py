@@ -140,7 +140,31 @@ def clone_repository(repository, has_dependencies):
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
 
+    branch_name_conversion = create_branch_name_conversion(repository)
+    branches = create_branches(branch_name_conversion)
+    tags = create_tags(branch_name_conversion)
+
+    external_checker = create_external_checker(repository, branches, tags)
+    remote_repository_name = get_remote_repository_name(repository, external_checker)
+    has_subfolder = external_checker.has_subfolder()
+
+    branch_name = get_branch_name(
+        external_checker, repository.branch_name, branches, tags
+    )
+
+    checkout_commit_hash(
+        repository.commit_revision,
+        remote_repository_name,
+        has_subfolder,
+        branch_name,
+        repository_folder,
+    )
+
     # extract upload functionality from git clone functionality, upload needs to be done in every case
+
+    # the safe variant would be to checkout a commit and create a new branch main_r33333
+    # if this branch is used with another revision, there wont be any conflicts/rewrite
+    # do a git commit --amend so it is clear to which revision it belongs by the text: git-svn-id
 
     # checkout_commit_hash(
     #     repository.commit_revision,
@@ -427,6 +451,8 @@ def create_and_push_commit(repository, working_directory):
 
     created_commit_hash = created_commit_hash.strip().replace("\n", "")
     repository.commit_revision = created_commit_hash
+    print(f"push and commit: new commit hash: {created_commit_hash}")
+    breakpoint()
 
     # find new commit is only needed, cause new commit is made, better: do git commit --amend to reserve history:
     # git upload without force push will not work anymore
