@@ -160,6 +160,13 @@ def clone_repository(repository, has_dependencies):
         repository_folder,
     )
 
+    checkout_new_branch_command = (
+        f"git checkout -b {branch_name}_{repository.commit_revision}"
+    )
+    execution.subprocess_execution.check_output_execute(
+        checkout_new_branch_command, repository_folder
+    )
+
     # extract upload functionality from git clone functionality, upload needs to be done in every case
 
     # the safe variant would be to checkout a commit and create a new branch main_r33333
@@ -418,7 +425,7 @@ def create_and_push_commit(repository, working_directory):
     add_command = "git add -A"
     execution.subprocess_execution.check_output_execute(add_command, working_directory)
 
-    commit_command = ["git", "commit", "-m", "activate git submodules"]
+    commit_command = ["git", "commit", "--amend", "--no-edit"]
     execution.subprocess_execution.check_output_execute(
         commit_command, working_directory
     )
