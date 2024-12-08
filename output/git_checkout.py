@@ -122,10 +122,19 @@ def clone_repository(repository, has_dependencies):
     repository_folder = os.path.join(local_folder_path, folder_name)
 
     print_mode = True
+
     if not execution.git_execution.check_remote_upload_exists(repository_folder):
         execution.git_execution.add_remote_upload(repository_name, repository_folder)
     if execution.git_execution.check_remote_upload_exists(repository_folder):
-        push_repository_as_live = "git push upload --mirror"
+        pull_command = "git pull upload HEAD"
+        execution.subprocess_execution.check_output_execute(
+            pull_command, repository_folder
+        )
+        push_repository_as_live = "git push upload --tags"
+        execution.subprocess_execution.check_output_execute(
+            push_repository_as_live, repository_folder
+        )
+        push_repository_as_live = "git push upload --all"
         execution.subprocess_execution.check_output_execute(
             push_repository_as_live, repository_folder
         )
@@ -194,7 +203,15 @@ def clone_repository(repository, has_dependencies):
 
 def checkout_single_file_from_svn(repository):
     base_server_url = configuration.get_base_server_url()
-    command = f"svn export {base_server_url}/{repository.remote_path}/{repository.branch_name}@{repository.commit_revision} ."
+    remote_path = repository.remote_path.replace(" (obsolete)", "")
+    commit_revision = repository.commit_revision.replace("r", "")
+    command = [
+        "svn",
+        "export",
+        f"{base_server_url}/{remote_path}/{repository.branch_name}@{commit_revision}",
+        ".",
+    ]
+
     print(f"{command} at: {repository.local_folder_path}")
 
     execution.subprocess_execution.check_output_execute(
