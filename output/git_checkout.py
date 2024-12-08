@@ -225,15 +225,6 @@ def add_submodule(repository):
 
     execution.subprocess_execution.check_output_execute(command, local_folder_path)
 
-    update_submodules_commands = [
-        "git submodule sync --recursive",
-        "git submodule update --init --recursive --remote",
-    ]
-    for each_command in update_submodules_commands:
-        execution.subprocess_execution.check_output_execute(
-            each_command, local_folder_path
-        )
-
     if remote_repository_name == "ag-pb-generator":
         breakpoint()
 
@@ -434,7 +425,7 @@ def create_and_push_commit(repository, working_directory):
 
     # execution.git_execution.add_remote_upload(repository_name, working_directory)
     if execution.git_execution.check_remote_upload_exists(working_directory):
-        push_command = "git push upload --mirror"
+        push_command = "git push --force upload HEAD"
         print(f"create_and_push_commit: {push_command}")
         execution.subprocess_execution.check_output_execute(
             push_command, working_directory
@@ -459,7 +450,6 @@ def create_and_push_commit(repository, working_directory):
     created_commit_hash = created_commit_hash.strip().replace("\n", "")
     repository.commit_revision = created_commit_hash
     print(f"push and commit: new commit hash: {created_commit_hash}")
-    breakpoint()
 
     # find new commit is only needed, cause new commit is made, better: do git commit --amend to reserve history:
     # git upload without force push will not work anymore

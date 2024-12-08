@@ -16,6 +16,7 @@ import output.git_checkout
 
 import pdb
 
+
 class RecursiveList:
     def __init__(
         self,
@@ -96,7 +97,6 @@ class RecursiveList:
             logger.debug(50 * "-" + "\n")
             self.print(recursive_list.dependencies)
 
-
     def checkout_git_repositories(
         self, remote_paths, iterator=None
     ):  # remote_paths is not needed at all for git checkout
@@ -137,7 +137,6 @@ class RecursiveList:
         if var is None:
             output.git_checkout.checkout_top_repository(self.current)
 
-
         if self.dependencies:
             if var is not None:
                 output.git_checkout.clone_repository(self.current, True)
@@ -148,13 +147,13 @@ class RecursiveList:
                 dependency.checkout_repositories("test")
                 output.git_checkout.add_submodule(dependency.current)
 
-
-
             if self.current.folder_name == "ag-mobile-app":
                 print("parsed recursively the mobile app")
 
             if var is not None:
-                working_directory = os.path.join(self.current.local_folder_path, self.current.folder_name)
+                working_directory = os.path.join(
+                    self.current.local_folder_path, self.current.folder_name
+                )
             else:
                 working_directory = self.current.local_folder_path
             output.git_checkout.create_and_push_commit(self.current, working_directory)
