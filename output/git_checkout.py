@@ -192,6 +192,16 @@ def clone_repository(repository, has_dependencies):
     # the else self.dependencies can stay empty since in recursive it is checked out by add_submodule
 
 
+def checkout_single_file_from_svn(repository):
+    base_server_url = configuration.get_base_server_url()
+    command = f"svn export {base_server_url}/{repository.remote_path}/{repository.branch_name}@{repository.commit_revision} ."
+    print(f"{command} at: {repository.local_folder_path}")
+
+    execution.subprocess_execution.check_output_execute(
+        command, repository.local_folder_path
+    )
+
+
 def add_submodule(repository):
     local_folder_path = repository.local_folder_path
     folder_name = repository.folder_name
@@ -201,6 +211,7 @@ def add_submodule(repository):
 
     if folder_name.endswith(".cs"):
         print(f"path is file (no submodule): {folder_name}")
+        checkout_single_file_from_svn(repository)
         return
 
     root_git_path = get_root_git_path(local_folder_path)
