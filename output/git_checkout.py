@@ -130,10 +130,13 @@ def clone_repository(repository, has_dependencies):
         execution.subprocess_execution.check_output_execute(
             pull_command, repository_folder
         )
-        push_repository_as_live = "git push upload --tags"
-        execution.subprocess_execution.check_output_execute(
-            push_repository_as_live, repository_folder
-        )
+        try:
+            push_repository_as_live = "git push upload --tags"
+            execution.subprocess_execution.check_output_execute(
+                push_repository_as_live, repository_folder
+            )
+        except ValueError:
+            pass  # already exist
         push_repository_as_live = "git push upload --all"
         execution.subprocess_execution.check_output_execute(
             push_repository_as_live, repository_folder
