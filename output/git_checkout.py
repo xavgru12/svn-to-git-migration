@@ -102,14 +102,25 @@ def clone_repository(repository, has_dependencies):
     repository_name = parser.branchConfigurationParser.parse_repo_name(
         repository.remote_path
     )
-    repository_name_no_externals = f"{repository_name}-no-externals"
+
+    branch_name_conversion = create_branch_name_conversion(repository)
+    branches = create_branches(branch_name_conversion)
+    tags = create_tags(branch_name_conversion)
+
+    external_checker = create_external_checker(repository, branches, tags)
+    remote_repository_name = get_remote_repository_name(repository, external_checker)
+    has_subfolder = external_checker.has_subfolder()
+
     folder_name = repository.folder_name
     local_folder_path = repository.local_folder_path
 
     if not has_dependencies:
-        command = f"git submodule add --force git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+        command = f"git submodule add --force git@bitbucket.org:curtisinst/{remote_repository_name}.git ./{folder_name}"
     else:
-        command = f"git clone git@bitbucket.org:curtisinst/{repository_name_no_externals}.git ./{folder_name}"
+        command = f"git clone git@bitbucket.org:curtisinst/{remote_repository_name}.git ./{folder_name}"
+        print(command)
+        # if "ag-pb" in remote_repository_name:
+        #     breakpoint()
 
     if folder_name.endswith(".cs"):
         print(f"path is file (no submodule): {folder_name}")
@@ -124,23 +135,26 @@ def clone_repository(repository, has_dependencies):
     print_mode = True
 
     if not execution.git_execution.check_remote_upload_exists(repository_folder):
-        execution.git_execution.add_remote_upload(repository_name, repository_folder)
-    if execution.git_execution.check_remote_upload_exists(repository_folder):
-        pull_command = "git pull upload HEAD"
-        execution.subprocess_execution.check_output_execute(
-            pull_command, repository_folder
+        execution.git_execution.add_remote_upload(
+            remote_repository_name, repository_folder
         )
-        try:
-            push_repository_as_live = "git push upload --tags"
+    if execution.git_execution.check_remote_upload_exists(repository_folder):
+        if not has_subfolder:
+            pull_command = "git pull upload HEAD"
+            execution.subprocess_execution.check_output_execute(
+                pull_command, repository_folder
+            )
+            try:
+                push_repository_as_live = "git push upload --tags"
+                execution.subprocess_execution.check_output_execute(
+                    push_repository_as_live, repository_folder
+                )
+            except ValueError:
+                pass  # already exist
+            push_repository_as_live = "git push upload --all"
             execution.subprocess_execution.check_output_execute(
                 push_repository_as_live, repository_folder
             )
-        except ValueError:
-            pass  # already exist
-        push_repository_as_live = "git push upload --all"
-        execution.subprocess_execution.check_output_execute(
-            push_repository_as_live, repository_folder
-        )
     else:
         if print_mode:
             add_missing_remote_to_file(
@@ -151,14 +165,6 @@ def clone_repository(repository, has_dependencies):
             raise ValueError(
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
-
-    branch_name_conversion = create_branch_name_conversion(repository)
-    branches = create_branches(branch_name_conversion)
-    tags = create_tags(branch_name_conversion)
-
-    external_checker = create_external_checker(repository, branches, tags)
-    remote_repository_name = get_remote_repository_name(repository, external_checker)
-    has_subfolder = external_checker.has_subfolder()
 
     branch_name = get_branch_name(
         external_checker, repository.branch_name, branches, tags
@@ -234,6 +240,9 @@ def add_submodule(repository):
         checkout_single_file_from_svn(repository)
         return
 
+    # if "emWin" in folder_name:
+    #     breakpoint()
+
     root_git_path = get_root_git_path(local_folder_path)
     subpath = local_folder_path[len(root_git_path) + 1 :]
     print(subpath)
@@ -256,8 +265,8 @@ def add_submodule(repository):
 
     execution.subprocess_execution.check_output_execute(command, local_folder_path)
 
-    if remote_repository_name == "ag-pb-generator":
-        breakpoint()
+    # if remote_repository_name == "ag-pb-generator":
+    #     breakpoint()
 
     if not execution.git_execution.check_remote_upload_exists(repository_path):
         execution.git_execution.add_remote_upload(
@@ -365,13 +374,13 @@ def checkout_commit_hash(
         git_branch_name,
     )
 
-    if (
-        commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c"
-    ):  # embeddeddb wrong commit hash
-        breakpoint()
+    # if (
+    #     commit_hash == "79e32336ba35101437795faabb9d7a6cd6b20a9c"
+    # ):  # embeddeddb wrong commit hash
+    #     breakpoint()
 
-    if commit_hash == "6da77de7136ba0fb5688a81c43afef64a0e0e852":
-        breakpoint()
+    # if commit_hash == "6da77de7136ba0fb5688a81c43afef64a0e0e852":
+    #     breakpoint()
 
     checkout_command = f"git checkout {commit_hash}"
     print(f"{checkout_command} at: {repository_path}")
