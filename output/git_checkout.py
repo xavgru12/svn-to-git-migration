@@ -240,8 +240,8 @@ def add_submodule(repository):
         checkout_single_file_from_svn(repository)
         return
 
-    # if "emWin" in folder_name:
-    #     breakpoint()
+    if "emWin" in folder_name:
+        breakpoint()
 
     root_git_path = get_root_git_path(local_folder_path)
     subpath = local_folder_path[len(root_git_path) + 1 :]
@@ -345,9 +345,6 @@ def get_remote_repository_name(repository, external_checker):
 
 
 def get_branch_name(external_checker, branch_name, branches, tags):
-    if not external_checker.has_subfolder():
-        return branch_name
-
     svn_extracted_branch_name = external_checker.get_extracted_branch_name()
     git_extracted_branch_name = branches.get(svn_extracted_branch_name)
     is_tag = False
@@ -409,10 +406,14 @@ def find_commit_hash_by(
         return commit_hash
 
     if "r" in commit_revision_or_hash and not has_subfolder:
-        commit_revision = commit_revision_or_hash
-        find_commit_hash_command = f"git svn find-rev {commit_revision}"
         migration_output_path = configuration.get_migration_output_path()
         migration_repository_path = os.path.join(migration_output_path, repository_name)
+        checkout_git_branch = f"git checkout {git_branch_name}"
+        execution.subprocess_execution.check_output_execute(
+            checkout_git_branch, migration_repository_path
+        )
+        commit_revision = commit_revision_or_hash
+        find_commit_hash_command = f"git svn find-rev {commit_revision}"
         return execution.subprocess_execution.check_output_execute(
             find_commit_hash_command, migration_repository_path
         )
