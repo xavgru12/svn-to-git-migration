@@ -166,7 +166,7 @@ def clone_repository(repository, has_dependencies):
                 f'error: remote origin for repository: "{repository_name}" does not exist'
             )
 
-    branch_name = get_branch_name(
+    branch_name, is_tag = get_branch_name(
         external_checker, repository.branch_name, branches, tags
     )
 
@@ -176,6 +176,7 @@ def clone_repository(repository, has_dependencies):
         has_subfolder,
         branch_name,
         repository_folder,
+        is_tag,
     )
 
     checkout_new_branch_command = (
@@ -278,7 +279,7 @@ def add_submodule(repository):
             remote_repository_name, repository_path
         )
 
-    branch_name = get_branch_name(
+    branch_name, is_tag = get_branch_name(
         external_checker, repository.branch_name, branches, tags
     )
 
@@ -288,6 +289,7 @@ def add_submodule(repository):
         has_subfolder,
         branch_name,
         repository_path,
+        is_tag,
     )
 
     print("submodule was added:")
@@ -354,7 +356,7 @@ def get_branch_name(external_checker, branch_name, branches, tags):
             git_extracted_branch_name = tags[svn_extracted_branch_name]
         except:
             breakpoint()
-    return git_extracted_branch_name
+    return git_extracted_branch_name, is_tag
 
 
 def checkout_commit_hash(
@@ -363,12 +365,10 @@ def checkout_commit_hash(
     has_subfolder,
     git_branch_name,
     repository_path,
+    is_tag,
 ):
     commit_hash = find_commit_hash_by(
-        commit_revision_or_hash,
-        repository_name,
-        has_subfolder,
-        git_branch_name,
+        commit_revision_or_hash, repository_name, has_subfolder, git_branch_name, is_tag
     )
 
     # if (
@@ -387,10 +387,7 @@ def checkout_commit_hash(
 
 
 def find_commit_hash_by(
-    commit_revision_or_hash,
-    repository_name,
-    has_subfolder,
-    git_branch_name,
+    commit_revision_or_hash, repository_name, has_subfolder, git_branch_name, is_tag
 ):
     if "r" not in commit_revision_or_hash:
         return commit_revision_or_hash
@@ -399,7 +396,7 @@ def find_commit_hash_by(
     working_directory = os.path.join(transformation_path, repository_name)
 
     commit_hash = get_matching_commit_hash_from_live_git_repository_by(
-        commit_revision_or_hash, git_branch_name, working_directory
+        commit_revision_or_hash, git_branch_name, working_directory, is_tag
     )
     if commit_hash is None:
         raise ValueError(
@@ -409,13 +406,17 @@ def find_commit_hash_by(
 
 
 def get_matching_commit_hash_from_live_git_repository_by(
-    commit_revision, git_branch_name, working_directory
+    commit_revision, git_branch_name, working_directory, is_tag
 ):
     commit_revision = commit_revision.replace("r", "")
     pattern = f"git-svn-id:.+@{commit_revision}"
 
+    branch_name = f"origin/{git_branch_name}"
+    if is_tag:
+        branch_name = git_branch_name
+
     commits = execution.subprocess_execution.check_output_execute(
-        ["git", "rev-list", git_branch_name], working_directory
+        ["git", "rev-list", branch_name], working_directory
     ).splitlines()
     for commit in commits:
         commit_message = subprocess.check_output(
