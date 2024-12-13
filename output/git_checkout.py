@@ -392,33 +392,20 @@ def find_commit_hash_by(
     has_subfolder,
     git_branch_name,
 ):
+    if "r" not in commit_revision_or_hash:
+        return commit_revision_or_hash
+
     transformation_path = configuration.get_transformation_output_path()
     working_directory = os.path.join(transformation_path, repository_name)
 
-    if "r" in commit_revision_or_hash and has_subfolder:
-        commit_hash = get_matching_commit_hash_from_live_git_repository_by(
-            commit_revision_or_hash, git_branch_name, working_directory
+    commit_hash = get_matching_commit_hash_from_live_git_repository_by(
+        commit_revision_or_hash, git_branch_name, working_directory
+    )
+    if commit_hash is None:
+        raise ValueError(
+            f"error: could not find commit hash for revision: {commit_revision_or_hash}"
         )
-        if commit_hash is None:
-            raise ValueError(
-                f"error: could not find commit hash for revision: {commit_revision_or_hash}"
-            )
-        return commit_hash
-
-    if "r" in commit_revision_or_hash and not has_subfolder:
-        migration_output_path = configuration.get_migration_output_path()
-        migration_repository_path = os.path.join(migration_output_path, repository_name)
-        checkout_git_branch = f"git checkout {git_branch_name}"
-        execution.subprocess_execution.check_output_execute(
-            checkout_git_branch, migration_repository_path
-        )
-        commit_revision = commit_revision_or_hash
-        find_commit_hash_command = f"git svn find-rev {commit_revision}"
-        return execution.subprocess_execution.check_output_execute(
-            find_commit_hash_command, migration_repository_path
-        )
-
-    return commit_revision_or_hash
+    return commit_hash
 
 
 def get_matching_commit_hash_from_live_git_repository_by(

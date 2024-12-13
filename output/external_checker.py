@@ -17,7 +17,7 @@ class ExternalChecker:
         return self.subfolder
 
     def get_extracted_branch_name(self):
-        return self.extracted_branch_name
+        return self.extracted_branch_name  # .replace("origin/", "")
 
     def find_suitable_names(self, branches):
         checker_list = []
@@ -50,6 +50,7 @@ class ExternalChecker:
             checker_list
         )
         if number == 0:
+            self.extracted_branch_name = branch_with_sub
             return False
         else:
             self.subfolder = self.branch_name.replace(f"{branch_without_sub}/", "")
