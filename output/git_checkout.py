@@ -241,8 +241,8 @@ def add_submodule(repository):
         checkout_single_file_from_svn(repository)
         return
 
-    if "emWin" in folder_name:
-        breakpoint()
+    # if "emWin" in folder_name:
+    #     breakpoint()
 
     root_git_path = get_root_git_path(local_folder_path)
     subpath = local_folder_path[len(root_git_path) + 1 :]
@@ -356,6 +356,8 @@ def get_branch_name(external_checker, branch_name, branches, tags):
             git_extracted_branch_name = tags[svn_extracted_branch_name]
         except:
             breakpoint()
+            git_extracted_branch_name = "main"
+            is_tag = False
     return git_extracted_branch_name, is_tag
 
 
@@ -408,10 +410,12 @@ def find_commit_hash_by(
 def get_matching_commit_hash_from_live_git_repository_by(
     commit_revision, git_branch_name, working_directory, is_tag
 ):
+    if git_branch_name == "git":
+        commit_revision = "r511860"
     commit_revision = commit_revision.replace("r", "")
     pattern = f"git-svn-id:.+@{commit_revision}"
 
-    branch_name = f"origin/{git_branch_name}"
+    branch_name = f"upload/{git_branch_name}"
     if is_tag:
         branch_name = git_branch_name
 
