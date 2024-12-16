@@ -214,11 +214,17 @@ def clone_repository(repository, has_dependencies):
 def checkout_single_file_from_svn(repository):
     base_server_url = configuration.get_base_server_url()
     remote_path = repository.remote_path.replace(" (obsolete)", "")
-    commit_revision = repository.commit_revision.replace("r", "")
+
+    if repository.commit_revision:
+        commit_revision = repository.commit_revision.replace("r", "")
+        commit_revision_string = f"@{commit_revision}"
+    else:
+        commit_revision_string = ""
+
     command = [
         "svn",
         "export",
-        f"{base_server_url}/{remote_path}/{repository.branch_name}@{commit_revision}",
+        f"{base_server_url}/{remote_path}/{repository.branch_name}{commit_revision_string}",
         ".",
     ]
 
@@ -412,6 +418,8 @@ def get_matching_commit_hash_from_live_git_repository_by(
 ):
     if git_branch_name == "git":
         commit_revision = "r511860"
+    if not commit_revision:
+        return ""
     commit_revision = commit_revision.replace("r", "")
     pattern = f"git-svn-id:.+@{commit_revision}"
 

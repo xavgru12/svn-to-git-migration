@@ -68,7 +68,7 @@ class LineParser:
         try:
             modified_line = int(modified_line)
         except ValueError:
-            modified_line = None
+            return None
 
         return f"r{modified_line}"
 
