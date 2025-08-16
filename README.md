@@ -24,7 +24,7 @@ Upload repositories without externals
 Upload repositories subfolders, when an external is linked as subfolder.
 --upload-no-externals-subfolders
 
-Create a git repository with git submodules converted from externals
+Create a Git repository with Git submodules converted from externals
 
 These are the steps which need to be executed subsequentially.
 
