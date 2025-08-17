@@ -10,6 +10,8 @@ It has this format: <svn_name> = <git_name> <git_email>
 # Execution
 
 ## Main Functionalities
+For a full migration, the following steps need to be executed subsequentially.
+
 
 Checkout SVN externals of the repository
 ```
