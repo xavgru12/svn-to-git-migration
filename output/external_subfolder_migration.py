@@ -102,7 +102,7 @@ def upload_subfolder(
     remote_exists = execution.git_execution.check_remote_upload_exists(destination_path)
     if remote_exists is False:
         if print_mode:
-            add_missing_remote_to_file(destination_name)
+            execution.git_execution.add_missing_remote_to_file(destination_name)
             print(f"added missing remote: {destination_name}")
         else:
             raise ValueError(
@@ -122,7 +122,13 @@ def upload_subfolder(
             execution.subprocess_execution.check_output_execute(
                 upload_branch_command, destination_path
             )
-
+        
+        dummy_main_commands = [["git", "checkout", "-b", "dummy_main"], ["git", "commit", "-m", "dummy main", "--allow-empty"], ["git", "push", "upload", "-f", "HEAD"]]
+        for each_command in dummy_main_commands:
+            execution.subprocess_execution.check_output_execute(
+                each_command, destination_path
+            )
+        
 
 def subfolder_exists(subfolder, repo_path):
     path = os.path.join(repo_path, subfolder)
@@ -150,14 +156,6 @@ def add_missing_remote_to_file(name):
         file.write(f"{name}\n")
 
 
-def get_commit_hash_from(commit_revision, working_directory):
-    command = f"git svn find-rev r{commit_revision}"
-    output = execution.subprocess_execution.check_output_execute(
-        command, working_directory
-    )
-    return output.strip().replace("\n", "")
-
-
 def reset_to_one_commit_before(commit_hash, repo_path):
     reset_command = f"git reset --hard {commit_hash}^"
     print(reset_command)
@@ -172,12 +170,8 @@ def create_repository_from_external_subfolder(external_subfolder, repo_path):
             f'error: subdirectory does not exist: "{sub_directory}", at: "{repo_path}"'
         )
 
-    filter_command = f"git filter-repo --path {external_subfolder} --force"
-    print(filter_command)
-    execution.subprocess_execution.check_output_execute(filter_command, repo_path)
-
     subfolder_command = (
-        f"git filter-repo --subdirectory-filter {external_subfolder} --force"
+        f"git filter-repo --subdirectory-filter {external_subfolder} --force --prune-empty never"
     )
     print(subfolder_command)
     execution.subprocess_execution.check_output_execute(subfolder_command, repo_path)

@@ -17,7 +17,7 @@ class ExternalChecker:
         return self.subfolder
 
     def get_extracted_branch_name(self):
-        return self.extracted_branch_name
+        return self.extracted_branch_name  # .replace("origin/", "")
 
     def find_suitable_names(self, branches):
         checker_list = []
@@ -28,9 +28,9 @@ class ExternalChecker:
                 count = len(extra_string)
                 checker_pair = (branch_without_sub, branch, count)
                 checker_list.append(checker_pair)
-
+        #  tags dictionary: origin/distr/distr to distr, self.extracted_branch_name must be origin/distr/distr, branch name originally is origin/distr
         if self.branch_name == "origin/distr":
-            checker_pair = (self.branch_name, self.branch_name, 0)
+            checker_pair = (self.branch_name, "origin/distr/distr", 0)
             checker_list.append(checker_pair)
 
         return checker_list
@@ -44,12 +44,17 @@ class ExternalChecker:
             "repositoriesWithoutBranches"
         ]
         if self.remote_path in repositories_without_branch:
+            self.extracted_branch_name = "origin/ProtoGen"
             return False
 
         branch_without_sub, branch_with_sub, number = self.find_smallest_int(
             checker_list
         )
         if number == 0:
+            # set correctly here
+            self.extracted_branch_name = branch_with_sub
+            if self.remote_path == "Curtis_AG/Enterprise/SW/CuRMiT":
+                self.extracted_branch_name = "origin/branches/git"
             return False
         else:
             self.subfolder = self.branch_name.replace(f"{branch_without_sub}/", "")

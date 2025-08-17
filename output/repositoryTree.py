@@ -2,16 +2,19 @@ from __future__ import annotations
 from typing import Any
 from typing import Optional
 import os
+
 import model.svnRepositoryModel
 import parser.svnRepositoryParser
 import data.configuration as configuration
-import output.gitCheckout
+import output.git_checkout
 import output.migration
 import output.logger
-
 import output.external_subfolder_migration
 import parser.branchConfigurationParser
 import output.transformation
+import output.git_checkout
+
+import pdb
 
 
 class RecursiveList:
@@ -103,13 +106,13 @@ class RecursiveList:
                 f"checkout git top: {iterator[0].current.remote_path}"
             )  # self.current.remote_path
             # need to inverse the recursive list here
-            output.gitCheckout.checkout(self.current)
+            output.git_checkout.checkout(self.current)
             print()
 
         for recursive_list in iterator:
             for dependency in recursive_list.dependencies:
                 print(f"checkout git: {dependency.current.remote_path}")
-                output.gitCheckout.checkout(dependency.current)
+                output.git_checkout.checkout(dependency.current)
                 print()
 
             self.checkout_git_repositories(remote_paths, recursive_list.dependencies)
@@ -129,6 +132,39 @@ class RecursiveList:
 
     def upload_subfolder_repositories(self, repositories):
         output.external_subfolder_migration.migrate(repositories)
+
+    def checkout_repositories(self, var=None):
+        if var is None:
+            output.git_checkout.checkout_top_repository(self.current)
+
+        if self.dependencies:
+            if var is not None:
+                output.git_checkout.clone_repository(self.current, True)
+            print("has dependencies")
+            print("current: ")
+            print(self.current)
+            for dependency in self.dependencies:
+                dependency.checkout_repositories("test")
+                output.git_checkout.add_submodule(dependency.current)
+
+            if self.current.folder_name == "ag-mobile-app":
+                print("parsed recursively the mobile app")
+
+            if var is not None:
+                working_directory = os.path.join(
+                    self.current.local_folder_path, self.current.folder_name
+                )
+            else:
+                working_directory = self.current.local_folder_path
+            output.git_checkout.create_and_push_commit(self.current, working_directory)
+        else:
+            pass
+            # if var is not None:
+            #     output.git_checkout.clone_repository(self.current, False)
+
+            # print("no more dependencies")
+            # print("current: ")
+            # print(self.current)
 
 
 class RepositoryTree:
@@ -198,3 +234,6 @@ class RepositoryTree:
             self.get_list_of_repositories_recursively()
 
         self.recursive_list.upload_subfolder_repositories(self.repositories)
+
+    def checkout_repositories_recursively(self):
+        self.recursive_list.checkout_repositories()
