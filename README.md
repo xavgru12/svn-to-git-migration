@@ -12,7 +12,7 @@ It has this format: <svn_name> = <git_name> <git_email>
 ## Main Functionalities
 For a full migration, the following steps need to be executed subsequentially.
 
-The main Python script, which is to be invoked is:
+The main Python script to be invoked is:
 
 svnExternals.py
 
