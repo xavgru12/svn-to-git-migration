@@ -9,7 +9,7 @@ It has this format: <svn_name> = <git_name> <git_email>
 
 # Execution
 
-## Following main functionalities  exist:
+## Main Functionalities
 
 Checkout SVN externals of the repository.
 ```
