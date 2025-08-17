@@ -11,7 +11,7 @@ It has this format: <svn_name> = <git_name> <git_email>
 
 ## Main Functionalities
 
-Checkout SVN externals of the repository.
+Checkout SVN externals of the repository
 ```
 --checkout-svn
 ```
