@@ -12,26 +12,55 @@ It has this format: <svn_name> = <git_name> <git_email>
 ## Following main functionalities  exist:
 
 Checkout SVN externals of the repository.
+```
 --checkout-svn
-
+```
 
 Migrate repositories including externals
+```
 --migrate
+```
 
 Upload repositories without externals
+```
 --upload-no-externals
+```
 
 Upload repositories subfolders, when an external is linked as subfolder.
+```
 --upload-no-externals-subfolders
+```
 
 Create a Git repository with Git submodules converted from externals
+```
+--checkout-git
+```
 
 These are the steps which need to be executed subsequentially.
 
-## Options for the script  
+## Important Options for the Script  
 url to SVN repostory
+```
 --remote-url
+```
 
 select a specific branch
+```
 --branch-path
+```
+
+local path where git-svn repositories will be generated
+```
+--migration-output-path
+```
+
+reset git-svn repositories and fetch from backup path
+```
+--reset-migration-output-path
+```
+
+for each git-svn repository, fetch latest SVN commit and add to publish to backup path
+```
+--fetch-and-publish-all
+```
 
