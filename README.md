@@ -38,8 +38,6 @@ Create a Git repository with Git submodules converted from externals
 --checkout-git
 ```
 
-These are the steps which need to be executed subsequentially.
-
 ## Important Options for the Script  
 url to SVN repostory
 ```
