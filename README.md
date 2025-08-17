@@ -59,7 +59,7 @@ reset git-svn repositories and fetch from backup path
 --reset-migration-output-path
 ```
 
-for each git-svn repository, fetch latest SVN state and add to publish to backup path
+for each git-svn repository, fetch latest SVN state and publish to backup path
 ```
 --fetch-and-publish-all
 ```
