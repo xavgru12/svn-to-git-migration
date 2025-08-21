@@ -66,18 +66,20 @@ class BranchNameConversion:
                     ) if svn_git_branch_pair is not None else None
 
                 if "ag-curmit" in self.repo_path:
-                    tag_pattern = "origin.*distr/"
-                    if not branch_pattern == line:
+                    distr_patterns = ["distr", "gitDistrDummy"]
+                    for pattern in distr_patterns:
+                        current_pattern = f"origin/{pattern}"
                         svn_git_branch_pair = (
                             self.retrieve_svn_git_branch_or_tag_pair_from_line(
-                                line, tag_pattern, self.branches_with_subfolders
+                                line, current_pattern, self.branches_with_subfolders
                             )
                         )
-                    else:
-                        svn_git_branch_pair = None
-                    branches.update(
-                        svn_git_branch_pair
-                    ) if svn_git_branch_pair is not None else None
+                        if svn_git_branch_pair is not None:
+                            for key in svn_git_branch_pair:
+                                svn_git_branch_pair[key] = f"{pattern}"
+                        branches.update(
+                            svn_git_branch_pair
+                        ) if svn_git_branch_pair is not None else None
 
                 if is_repository_without_branch_name:
                     if self.is_not_twice_in_string("/", line) and "origin/" in line:
@@ -194,7 +196,7 @@ class BranchNameConversion:
 
 
 if __name__ == "__main__":
-    repo_path = r"C:\localSharedPool\ag-protobuf-net"
+    repo_path = r"C:\localSharedPool\ag-curmit"
     # repo_path = r"C:\localSharedPool\ag-econ-w"
     branch_name_conversion = BranchNameConversion(repo_path)
     branches = branch_name_conversion.create_branches_dictionary()

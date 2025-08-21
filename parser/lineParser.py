@@ -68,9 +68,9 @@ class LineParser:
         try:
             modified_line = int(modified_line)
         except ValueError:
-            modified_line = None
+            return None
 
-        return modified_line
+        return f"r{modified_line}"
 
     def parse_name(self):
         modified_line = self.line.split(" ")[-1]

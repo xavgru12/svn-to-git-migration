@@ -20,14 +20,16 @@ def checkout_each_external(repository):
     """
     os.makedirs(repository.local_folder_path, exist_ok=True)
     print(f"Started svn external checkout: {repository.folder_name}")
-    if repository.commit_revision is not None:
-        revision = f"-r {repository.commit_revision}"
-    else:
-        revision = ""
 
-    checkout_command = f"svn checkout {revision} {configuration.get_base_server_url()}/{repository.remote_path}/{repository.branch_name} {repository.folder_name}"
+    if repository.commit_revision is not None:
+        commit_revision = repository.commit_revision.replace("r", "")
+        commit_revision_string = f"-r {commit_revision}"
+    else:
+        commit_revision_string = ""
+
+    checkout_command = f"svn checkout {commit_revision_string} {configuration.get_base_server_url()}/{repository.remote_path}/{repository.branch_name} {repository.folder_name}"
     switch_command = f"svn switch {configuration.get_base_server_url()}/{repository.remote_path}/{repository.branch_name} {repository.folder_name}"
-    update_command = f"svn update {revision} {repository.folder_name}"
+    update_command = f"svn update {commit_revision_string} {repository.folder_name}"
     print(f"{repository.local_folder_path}: {checkout_command}")
 
     try:

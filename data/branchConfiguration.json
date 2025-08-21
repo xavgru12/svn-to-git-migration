@@ -31,7 +31,8 @@
                 "tags",
                 "tag",
                 "distribution",
-                "distr"
+                "distr",
+                "gitDistrDummy"
             ],
             "subfolders": [
                 "review",

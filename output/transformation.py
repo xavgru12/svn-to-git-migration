@@ -1,5 +1,6 @@
 import shutil
 import os
+import pdb
 
 import subprocess
 import multiprocessing
@@ -62,16 +63,27 @@ def transform_git_bridge_to_native_git(repo_path):
 
     repo_name = create_repo_name(repo_path)
     execution.git_execution.add_remote_origin(repo_name, repo_path)
-    execution.git_execution.check_remote_origin_exists(repo_path)
+    remote_exists = execution.git_execution.check_remote_origin_exists(repo_path)
 
-    branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
-        repo_path
-    )
-    svn_git_branch_pairs = branch_name_conversion.create_branches_dictionary()
-    svn_git_tag_pairs = branch_name_conversion.create_tags_dictionary()
+    print_mode = True
 
-    transform_branches(repo_path, svn_git_branch_pairs)
-    transform_tags(repo_path, svn_git_tag_pairs)
+    if remote_exists is False:
+        if print_mode:
+            execution.git_execution.add_missing_remote_to_file(repo_name)
+            print(f"added missing remote: {repo_name}")
+        else:
+            raise ValueError(
+                f'error: remote origin for repository: "{repo_name}" does not exist'
+            )
+    else:
+        branch_name_conversion = output.branch_name_conversion.BranchNameConversion(
+            repo_path
+        )
+        svn_git_branch_pairs = branch_name_conversion.create_branches_dictionary()
+        svn_git_tag_pairs = branch_name_conversion.create_tags_dictionary()
+
+        transform_branches(repo_path, svn_git_branch_pairs)
+        transform_tags(repo_path, svn_git_tag_pairs)
 
 
 def create_repo_name(repo_path):
@@ -103,7 +115,13 @@ def transform_branches(repo_path, svn_git_branch_pairs):
         branch_commands, max_length, base_command
     )
     for branch_command in branch_command_list:
-        execution.subprocess_execution.check_output_execute(branch_command, repo_path)
+        try:
+            execution.subprocess_execution.check_output_execute(
+                branch_command, repo_path
+            )
+        except Exception:
+            print(repo_path)
+            breakpoint()
 
 
 def generate_branch_commands(branches, max_length, base_command):
@@ -146,7 +164,7 @@ def create_git_tag(branch, tag_name, repo_path):
     logger = output.logger.LoggerFactory.create(f"{name}-uploadTags", f"{log_name}.log")
 
     logger.debug(f"working directory tag command: {repo_path}")
-    logger.debug(f"{" ".join(tag_command)}")
+    logger.debug(f"{' '.join(tag_command)}")
     logger.debug("\n")
     logger.debug(20 * "-")
     try:

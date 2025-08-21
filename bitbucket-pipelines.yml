@@ -31,6 +31,13 @@ pipelines:
           name: "Upload Econ subfolders"
           script:
             - python svnExternals.py --upload-econ-folder-subfolders --local-path C:\econwTest
+      - step:
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Upload Core with submodules"
+          script:
+            - python svnExternals.py --local-path C:\gitCheckoutTestCore --remote-url "http://ag-reposerver/repo/Projects/ECON/SW/Core" --checkout-git
     enablex1-upload:
       - step:
           runs-on:
@@ -53,3 +60,10 @@ pipelines:
           name: "Upload enableX1 subfolders"
           script:
             - python svnExternals.py --remote-url http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1 --upload-no-externals-subfolders
+      - step:
+          runs-on:
+            - self.hosted
+            - windows
+          name: "Upload enableX1 with submodules"
+          script:
+            - python svnExternals.py --local-path C:\gitCheckoutTestEnableX --remote-url "http://ag-reposerver/repo/Projects/enAbleX1/SW/eX1" --checkout-git

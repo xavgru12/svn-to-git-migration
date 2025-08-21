@@ -13,9 +13,9 @@ def check_remote_origin_exists(repo_path):
     try:
         execution.subprocess_execution.check_output_execute(checker_command, repo_path)
     except:
-        raise ValueError(
-            f'error: remote origin for repository: "{repo_path}" does not exist'
-        )
+        return False
+
+    return True
 
 
 def add_remote_upload(repo_name, repo_path):
@@ -41,6 +41,12 @@ def remove_remote_origin(repo_path):
     execution.subprocess_execution.check_output_execute(command, repo_path)
 
 
+def remove_remote_upload(repo_path):
+    command = "git remote remove upload"
+
+    execution.subprocess_execution.check_output_execute(command, repo_path)
+
+
 def fetch(repo_path):
     fetch_command = "git fetch"
     execution.subprocess_execution.check_output_execute(fetch_command, repo_path)
@@ -49,3 +55,10 @@ def fetch(repo_path):
 def push_local_git_tags(repo_path):
     command = "git push origin --tags --force"
     execution.subprocess_execution.check_output_execute(command, repo_path)
+
+
+def add_missing_remote_to_file(name):
+    file_path = "remotes.txt"
+
+    with open(file_path, "a") as file:
+        file.write(f"{name}\n")
