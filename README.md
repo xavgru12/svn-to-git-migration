@@ -1,11 +1,27 @@
 # SVN to Git Migration
 This script is built on top of Git's git-svn. The most knowledgable feature is
-that it converts externals to submodules.
+that it converts externals to submodules inlcuding handling SVN subfolder checkouts.
 
 # Setup
+
+## Authors File
 Provide an authors file in ./data/svn-authors.txt.
 
+This file is used from the scripts by default.
+
 It has this format: <svn_name> = <git_name> <git_email> 
+
+## Branch Configuration
+SVN provides no way of detecting branches. Each branch is treated as a directory with
+ no differentiation between branches and directories/subdirectories.
+In Git branches are not part of directories and can be especially identified.
+In order to detect and map SVN branches to Git a configuration
+file is established.
+
+It is differentiated between trunk, branches and tags.
+Directories without a branch, as well as subdirectories to be treated as branches can be configured, too.
+A thorough example(which is used from the scripts by default) can be found at: ./data/branchConfiguration.json
+
 
 # Execution
 
